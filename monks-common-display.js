@@ -19,3 +19,9 @@ export let combatposition = () => {
 export class MonksCommonDisplay {
 }
 
+Hooks.on('ready', () => {
+    $('#logo').on('click', function () {
+        $('body').toggleClass('hide-ui');
+    });
+})
+

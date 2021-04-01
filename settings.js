@@ -1,4 +1,4 @@
-import { MonksLittleDetails, i18n } from "./monks-common-display.js";
+import { MonksCommonDisplay, i18n } from "./monks-common-display.js";
 
 export const registerSettings = function () {
     // Register any custom module settings here
