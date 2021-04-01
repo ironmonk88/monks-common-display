@@ -1,4 +1,6 @@
 {
-  "MonksCommonDisplay.click-to-view.name": "Click to View",
-  "MonksCommonDisplay.click-to-view.hint": "Click to view a scene rather than configure it."
+  "MonksCommonDisplay.display-players.name": "Common Display Players",
+  "MonksCommonDisplay.display-players.hint": "Player names that are set to be common display",
+  "MonksCommonDisplay.show-combat.name": "Show Combat",
+  "MonksCommonDisplay.show-combat.hint": "Show the combat display when a combat starts, and hide it when it ends"
 }
