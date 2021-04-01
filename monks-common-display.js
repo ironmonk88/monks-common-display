@@ -32,7 +32,7 @@ export class MonksCommonDisplay {
         if (MonksCommonDisplay.isDisplay)
             MonksCommonDisplay.toggleCommonDisplay();
 
-        if (game.user.isGM)
+        if (game.user.isGM && !MonksCommonDisplay.isDisplay)
             MonksCommonDisplay.initGM();
 
         if (game.user.isGM || MonksCommonDisplay.isDisplay) {
