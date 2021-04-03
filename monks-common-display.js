@@ -48,6 +48,8 @@ export class MonksCommonDisplay {
         $('body').toggleClass('hide-ui');
         ui.sidebar.activateTab('chat');
 
+        $('#sidebar').toggle(setting('show-chat-log'));
+
         Hooks.on("updateCombat", function (combat, delta) {
             if (setting("show-combat") && delta.round === 1 && combat.turn === 0 && combat.started === true) {
                 //new combat, pop it out
@@ -85,14 +87,19 @@ export class MonksCommonDisplay {
 
     static initGM() {
         Hooks.on("canvasPan", (canvas, data) => {
-            if (canvas.scene.active) {
-                game.socket.emit(MonksCommonDisplay.SOCKET, { action: "canvasPan", args: [data] });
-            }
+            MonksCommonDisplay.sendCanvasPan(data);
         });
 
         Hooks.on("closeImagePopout", (popout, html) => {
             game.socket.emit(MonksCommonDisplay.SOCKET, { action: "closeImagePopout", args: [popout.appId] });
         });
+    }
+
+    static sendCanvasPan(data) {
+        if (canvas.scene.active && setting("mirror-movement")) {
+            log('pan data', data)
+            game.socket.emit(MonksCommonDisplay.SOCKET, { action: "canvasPan", args: [data] });
+        }
     }
 
     static onMessage(data) {
@@ -116,5 +123,22 @@ Hooks.on('ready', () => {
     MonksCommonDisplay.ready();
 });
 
-
-
+Hooks.on("getSceneControlButtons", (controls) => {
+    if (game.settings.get('monks-common-display', 'show-mirror-tool')) {
+        const mirrorPanTool = {
+            name: "mirror-screen",
+            title: "MonksCommonDisplay.mirror-screen",
+            icon: "fas fa-exchange-alt",
+            toggle: true,
+            active: setting('mirror-movement'),
+            onClick: (checked) => {
+                game.settings.set("monks-common-display", "mirror-movement", checked).then(() => {
+                    if (checked)
+                        MonksCommonDisplay.sendCanvasPan(canvas.scene._viewPosition);
+                });
+            }
+        };
+        let tokenTools = controls.find(control => control.name === "token").tools;
+        tokenTools.push(mirrorPanTool);
+    }
+});

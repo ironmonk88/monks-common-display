@@ -6,6 +6,13 @@ Set up a display without all the ui so that it can be displayed on an alternate 
 Simply use the install module screen within the FoundryVTT setup
 
 ## Usage & Current Features
+Use the configuration settings to set up one or more player names to be used as a common display, separated by commas.  Once they are added, the next time that player loads up a screen it will display as a common display.
+
+You can also configure if you want the side menu to show with the chat log.  Or if you want the combat to be displayed.  If combat is displayed, it will be automatically closed when the combat has ended.
+
+A toggle button will also be added to the Token menu that will allow your position and scale to be mirrored on the common display.  This can be toggled off so that you can move the screen somewhere else.
+
+Any time you show a picture for your players it will be displayed on the common screen, and when you close it on the GM's screen it will close ont he common display.
 
 ## Bug Reporting
 I'm sure there are lots of issues with it.  It's very much a work in progress.
