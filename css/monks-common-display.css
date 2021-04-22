@@ -1,7 +1,8 @@
-body.hide-ui > *:not(#logo):not(#board):not(#confetti-canvas):not(#dice-box-canvas):not(#pause):not(#sidebar):not(#notifications):not(#loading):not(#narrator):not(#combat-popout):not(.image-popout):not(.journal-sheet):not(.journal-attached),
+body.hide-ui > *:not(#logo):not(#board):not(#hud):not(#confetti-canvas):not(#dice-box-canvas):not(#pause):not(#sidebar):not(#notifications):not(#loading):not(#narrator):not(#combat-popout):not(.image-popout):not(.journal-sheet):not(.journal-attached),
+body.hide-ui #hud > *:not(#image-hover-hud),
 body.hide-ui #sidebar > *:not(.sidebar-tab[data-tab="chat"]),
 body.hide-ui #sidebar .sidebar-tab[data-tab="chat"] > *:not(#chat-log),
-body.hide-ui .image-popout > *:not(.window-content){
+body.hide-ui .image-popout > *:not(.window-content) {
     display: none !important;
 }
 
@@ -32,4 +33,103 @@ body.hide-ui #combat-popout .sidebar-tab .combatant.active .token-name > *:not(h
 
 body.hide-ui #logo {
     opacity: 0.5;
+}
+
+.monks-common-display .sheet .items-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    color: #7a7971;
+}
+
+.monks-common-display .sheet .items-list .item-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.monks-common-display .sheet .items-list .item-name {
+    flex: 1;
+    margin: 0;
+    overflow: hidden;
+    font-size: 13px;
+    text-align: left;
+    align-items: center;
+}
+
+.monks-common-display .sheet .items-list .item-name h3,
+.monks-common-display .sheet .items-list .item-name h4 {
+    margin: 0;
+    white-space: nowrap;
+    overflow-x: hidden;
+}
+
+.monks-common-display .sheet .items-list .item {
+    align-items: center;
+    padding: 0 2px;
+    border-bottom: 1px solid #c9c7b8;
+}
+
+.monks-common-display .sheet .items-list .item:last-child {
+    border-bottom: none;
+}
+
+.monks-common-display .sheet .items-list .item .item-name {
+    color: #191813;
+}
+
+.monks-common-display .sheet .items-list .item .item-name .item-image {
+    flex: 0 0 30px;
+    height: 30px;
+    width: 30px;
+    background-size: 30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    margin-right: 5px;
+    text-align: center;
+}
+
+.window-content .monks-common-display .sheet .items-list .item .item-name .item-image {
+    flex: 0 0 48px;
+    width: 48px;
+}
+
+.monks-common-display .sheet .items-list .item-controls{
+    flex: 0 0 90px;
+    text-align:center;
+}
+
+.monks-common-display .sheet .items-list .item-controls > input{
+    margin:auto;
+}
+
+.monks-common-display .sheet .items-list .items-header {
+    height: 28px;
+    margin: 2px 0;
+    padding: 0;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.05);
+    border: 2px groove #eeede0;
+    font-weight: bold;
+}
+
+.monks-common-display .sheet .items-list .items-header .item-control {
+    font-weight: normal;
+    flex: 0 0 90px;
+    font-size: 12px;
+    text-align: center;
+}
+
+.monks-common-display .sheet .items-list .items-header h3 {
+    padding-left: 5px;
+    font-family: "Modesto Condensed", "Palatino Linotype", serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: left;
+    font-size: 16px;
+    min-width: 60px;
 }

@@ -10,5 +10,17 @@
   "MonksCommonDisplay.show-chat-log.name": "Show Chat log",
   "MonksCommonDisplay.show-chat-log.hint": "Show the side menu with the chat log displayed.",
 
-  "MonksCommonDisplay.mirror-screen": "Mirror Screen"
+  "MonksCommonDisplay.change-settings": "Change Settings",
+  "MonksCommonDisplay.mirror-screen": "Mirror Screen",
+  "MonksCommonDisplay.clear-images": "Clear Images",
+
+  "MonksCommonDisplay.players": "Players",
+  "MonksCommonDisplay.display.name": "Display",
+  "MonksCommonDisplay.display.hint": "Use this player as a common display",
+  "MonksCommonDisplay.mirror.name": "Mirror",
+  "MonksCommonDisplay.mirror.hint": "This player is capable of mirroring the screen",
+  "MonksCommonDisplay.clear.name": "Clear",
+  "MonksCommonDisplay.clear.hint": "Clear all open windows for this player",
+
+  "MonksCommonDisplay.save": "Save Changes"
 }
