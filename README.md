@@ -7,6 +7,7 @@ Simply use the install module screen within the FoundryVTT setup
 
 ## Usage & Current Features
 Using the common display toolbar, you can change settings, clear any open images on the display screen, or toggle the display screen mirroring your actions.
+
 ![monks-common-display](/screenshots/toolbar1.png)
 ![monks-common-display](/screenshots/toolbar2.png)
 
