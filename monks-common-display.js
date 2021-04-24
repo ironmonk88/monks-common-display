@@ -139,7 +139,7 @@ export class MonksCommonDisplay {
     static closeImagePopout(id) {
         //check to see if this is a player, if this is and it currently applies to this user, then we need to clear all the potentially open windows
         let user = game.users.find(u => u.id == id);
-        if (user || id == undefined) {
+        if (user || (id == undefined && MonksCommonDisplay.playerdata.display)) {
             $('.image-popout .header-button.close').click();
         }//else
         //    $('#app-' + id + ' .header-button.close').click(); //app-id isn't shared, I guess that should be obvious
