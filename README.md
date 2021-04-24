@@ -17,7 +17,7 @@ Changing the settings will let you select which player is to be used as your dis
 
 Pressing the clear images tool bar button will clear any open images for display players.
 
-Toggling the Mirror Screen button will allow your position and scale to be mirrored on the common display.  This can be toggled off so that you can move the screen somewhere else.
+Toggling the Mirror Screen button will allow your position and scale to be mirrored on the common display.  This can be toggled off so that you can move the screen somewhere else.  The M key is also set as the hotkey for toggling that setting.  This can be changed in settings.
 
 You can also configure if you want the side menu to show with the chat log.  Or if you want the combat to be displayed.  If combat is displayed, it will be automatically closed when the combat has ended.
 
