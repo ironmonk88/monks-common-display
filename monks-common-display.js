@@ -68,7 +68,7 @@ export class MonksCommonDisplay {
     static toggleCommonDisplay() {
         let display = MonksCommonDisplay.playerdata.display || false;
         $('body').toggleClass('hide-ui', display);
-        if (display)
+        if (display && ui.sidebar)
             ui.sidebar.activateTab('chat');
 
         $('#sidebar').toggle(setting('show-chat-log') || !display);
@@ -108,6 +108,7 @@ export class MonksCommonDisplay {
             MonksCommonDisplay.sendCanvasPan(data);
         });
 
+        //I've temporarily removed this as the app-id isn't the same
         /*
         Hooks.on("closeImagePopout", (popout, html) => {
             game.socket.emit(MonksCommonDisplay.SOCKET, { action: "closeImagePopout", args: [popout.appId] });
