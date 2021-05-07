@@ -1,3 +1,6 @@
+# Version 1.0.3
+Fixed issue where the chat window wasn't hiding after a refresh
+
 # Version 1.0.2
 Added support for Health Estimate
 

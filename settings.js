@@ -46,6 +46,9 @@ export const registerSettings = function () {
 		config: true,
 		default: true,
 		type: Boolean,
+		onChange: () => {
+			MonksCommonDisplay.toggleCommonDisplay();
+		}
 	});
 	game.settings.register(modulename, "show-combat", {
 		name: i18n("MonksCommonDisplay.show-combat.name"),
@@ -54,6 +57,9 @@ export const registerSettings = function () {
 		config: true,
 		default: true,
 		type: Boolean,
+		onChange: () => {
+			MonksCommonDisplay.toggleCommonDisplay();
+		}
 	});
 
 	game.settings.register(modulename, "startupdata", {

@@ -67,11 +67,11 @@ export class MonksCommonDisplay {
 
     static toggleCommonDisplay() {
         let display = MonksCommonDisplay.playerdata.display || false;
-        $('body').toggleClass('hide-ui', display);
+        $('body').toggleClass('hide-ui', display).toggleClass('hide-chat', display && !setting('show-chat-log'));
         if (display && ui.sidebar)
             ui.sidebar.activateTab('chat');
 
-        $('#sidebar').toggle(setting('show-chat-log') || !display);
+        //$('#sidebar').toggle(setting('show-chat-log') || !display);
     }
 
     static toggleMirrorScreen(checked) {
