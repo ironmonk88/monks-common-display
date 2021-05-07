@@ -1,3 +1,6 @@
+# Version 1.0.2
+Added support for Health Estimate
+
 # Version 1.0.1
 Added hotkey support for changing Mirror Screen setting
 
