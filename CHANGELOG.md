@@ -1,3 +1,6 @@
+# Version 1.0.4
+Changes to support 0.8.x
+
 # Version 1.0.3
 Fixed issue where the chat window wasn't hiding after a refresh
 

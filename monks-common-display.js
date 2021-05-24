@@ -19,6 +19,14 @@ export let combatposition = () => {
 };
 
 function registerLayer() {
+    CONFIG.Canvas.layers.MonksCommonDisplayLayer = MonksCommonDisplayLayer;
+    CONFIG.MonksCommonDisplayLayer = {
+        documentClass: null,
+        layerClass: MonksCommonDisplayLayer,
+        sheetClass: NoteConfig,
+        objectClass: Note
+    };
+    /*
     const layers = mergeObject(Canvas.layers, {
         MonksCommonDisplayLayer: MonksCommonDisplayLayer
     });
@@ -26,7 +34,7 @@ function registerLayer() {
         get: function () {
             return layers
         }
-    });
+    });*/
 }
 
 export class MonksCommonDisplay {
