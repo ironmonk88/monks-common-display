@@ -1,3 +1,6 @@
+# Version 1.0.5
+Fixed issues with the layer
+
 # Version 1.0.4
 Changes to support 0.8.x
 
