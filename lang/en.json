@@ -5,6 +5,8 @@
   "MonksCommonDisplay.show-combat.hint": "Show the combat display when a combat starts, and hide it when it ends",
   "MonksCommonDisplay.mirror-movement.name": "Mirror Movement",
   "MonksCommonDisplay.mirror-movement.hint": "Mirror scale and position of the GM's screen on the common display",
+  "MonksCommonDisplay.mirror-token-selection.name": "Mirror Token Selection",
+  "MonksCommonDisplay.mirror-token-selection.hint": "Mirror token selection of the GM's screen on the common display (if owned)",
   "MonksCommonDisplay.show-mirror-tool.name": "Show Mirror Tool",
   "MonksCommonDisplay.show-mirror-tool.hint": "Show the mirror tool with the token tools",
   "MonksCommonDisplay.show-chat-log.name": "Show Chat log",
@@ -12,13 +14,16 @@
 
   "MonksCommonDisplay.change-settings": "Change Settings",
   "MonksCommonDisplay.mirror-screen": "Mirror Screen",
+  "MonksCommonDisplay.mirror-selection": "Mirror Token Selection",
   "MonksCommonDisplay.clear-images": "Clear Images",
 
   "MonksCommonDisplay.players": "Players",
   "MonksCommonDisplay.display.name": "Display",
   "MonksCommonDisplay.display.hint": "Use this player as a common display",
-  "MonksCommonDisplay.mirror.name": "Mirror",
+  "MonksCommonDisplay.mirror.name": "Mirror Screen",
   "MonksCommonDisplay.mirror.hint": "This player is capable of mirroring the screen",
+  "MonksCommonDisplay.selection.name": "Mirror Selection",
+  "MonksCommonDisplay.selection.hint": "This player is capable of mirroring the token selection",
   "MonksCommonDisplay.clear.name": "Clear",
   "MonksCommonDisplay.clear.hint": "Clear all open windows for this player",
 

@@ -11,6 +11,9 @@
                         <div class="item-control" title="{{localize 'MonksCommonDisplay.mirror.hint'}}">
                             {{localize 'MonksCommonDisplay.mirror.name'}}
                         </div>
+                        <div class="item-control" title="{{localize 'MonksCommonDisplay.selection.hint'}}">
+                            {{localize 'MonksCommonDisplay.selection.name'}}
+                        </div>
                         <div class="item-control" title="{{localize 'MonksCommonDisplay.clear.hint'}}">
                             {{localize 'MonksCommonDisplay.clear.name'}}
                         </div>
@@ -32,6 +35,9 @@
                             </div>
                             <div class="item-controls flexrow">
                                 <input type="checkbox" {{#if this.mirror}}checked{{/if}} class="mirror" />
+                            </div>
+                            <div class="item-controls flexrow">
+                                <input type="checkbox" {{#if this.selection}}checked{{/if}} class="selection" />
                             </div>
                             <div class="item-controls flexrow">
                                 <a class="item-control clear" title="{{localize 'MonksCommonDisplay.clear-images'}}"><i class="fas fa-trash"></i></a>

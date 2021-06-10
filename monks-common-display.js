@@ -2,8 +2,10 @@
 import { ControllerApp } from "./apps/controller.js"
 import { MonksCommonDisplayLayer } from './monks-common-display-layer.js';
 
+export const DEBUG = false;
+
 export let debug = (...args) => {
-    if (debugEnabled > 1) console.log("DEBUG: monks-common-display | ", ...args);
+    if (DEBUG) console.log("DEBUG: monks-common-display | ", ...args);
 };
 export let log = (...args) => console.log("monks-common-display | ", ...args);
 export let warn = (...args) => console.warn("monks-common-display | ", ...args);
@@ -65,12 +67,19 @@ export class MonksCommonDisplay {
     static dataChange() {
         let data = setting('playerdata');
         let olddata = MonksCommonDisplay.playerdata;
-        MonksCommonDisplay.playerdata = data[game.user.id] || { display: false, mirror: false };
+        MonksCommonDisplay.playerdata = data[game.user.id] || { display: false, mirror: false, selection: false };
 
         game.settings.set('monks-common-display', 'startupdata', MonksCommonDisplay.playerdata.display);
 
         if (olddata.display != MonksCommonDisplay.playerdata.display)
             MonksCommonDisplay.toggleCommonDisplay();
+
+        // release all tokens on common display for easier sync
+        if (MonksCommonDisplay.playerdata.display) {
+            for (const token of game.canvas.tokens.controlled) {
+                token.release();
+            }
+        }
     }
 
     static toggleCommonDisplay() {
@@ -93,6 +102,15 @@ export class MonksCommonDisplay {
         });
     }
 
+    static toggleMirrorTokenSelection(checked) {
+        if (checked == undefined)
+            checked = !setting("mirror-token-selection");
+
+        game.settings.set("monks-common-display", "mirror-token-selection", checked).then(() => {
+            $('#controls li[data-tool="mirror-selection"]').toggleClass('active', setting("mirror-token-selection"));
+        });
+    }
+
     static registerHotKeys() {
         Hotkeys.registerGroup({
             name: 'monks-common-display.hotkeys',
@@ -109,11 +127,25 @@ export class MonksCommonDisplay {
                 MonksCommonDisplay.toggleMirrorScreen();
             }
         });
+
+        Hotkeys.registerShortcut({
+            name: `monks-common-display_mirror-selection`,
+            label: `Toggle Mirror Token Selection`,
+            group: 'monks-common-display.hotkeys',
+            default: () => { return { key: Hotkeys.keys.KeyN, alt: false, ctrl: false, shift: false }; },
+            onKeyDown: (e) => {
+                MonksCommonDisplay.toggleMirrorTokenSelection();
+            }
+        });
     }
 
     static initGM() {
         Hooks.on("canvasPan", (canvas, data) => {
             MonksCommonDisplay.sendCanvasPan(data);
+        });
+
+        Hooks.on("controlToken", (token, control) => {
+            MonksCommonDisplay.sendTokenSelection([token.data.actorId, control]);
         });
 
         //I've temporarily removed this as the app-id isn't the same
@@ -124,20 +156,27 @@ export class MonksCommonDisplay {
     }
 
     static sendCanvasPan(data) {
-        if (canvas.scene.active && setting("mirror-movement")) {
-            //see if there are any display players logged in
-            let found = false;
-            for (let [k, v] of Object.entries(setting('playerdata'))) {
-                if (v.display === true && game.users.get(k)?.active == true) {
-                    found = true;
-                    break;
-                }
-            }
-            if (found) {
-                log('pan data', data)
-                game.socket.emit(MonksCommonDisplay.SOCKET, { action: "canvasPan", args: [data] });
+        if (canvas.scene.active && setting("mirror-movement") && MonksCommonDisplay.isAnyDisplayPlayerLoggedIn()) {
+            debug('pan data', data)
+            game.socket.emit(MonksCommonDisplay.SOCKET, { action: "canvasPan", args: [data] });
+        }
+    }
+
+    static sendTokenSelection(data) {
+        if (canvas.scene.active && setting("mirror-token-selection") && MonksCommonDisplay.isAnyDisplayPlayerLoggedIn()) {
+            debug('selection data', data);
+            game.socket.emit(MonksCommonDisplay.SOCKET, { action: "controlToken", args: [data] });
+        }
+    }
+
+    static isAnyDisplayPlayerLoggedIn() {
+        for (let [k, v] of Object.entries(setting('playerdata'))) {
+            if (v.display === true && game.users.get(k)?.active == true) {
+                return true;
             }
         }
+
+        return false;
     }
 
     static onMessage(data) {
@@ -156,6 +195,28 @@ export class MonksCommonDisplay {
     static canvasPan(data) {
         if (MonksCommonDisplay.playerdata.display && MonksCommonDisplay.playerdata.mirror)
             canvas.pan(data);
+    }
+
+    static controlToken(data) {
+        if (!MonksCommonDisplay.playerdata.display || !MonksCommonDisplay.playerdata.selection) {
+            return;
+        }
+
+        const actor = game.actors.get(data[0]);
+
+        if (actor.owner) {
+            const tokens = actor.getActiveTokens();
+
+            for (const token of tokens) {
+                token.refresh();
+
+                if (data[1]) {
+                    token.control({ releaseOthers: false });
+                } else {
+                    token.release();
+                }
+            }
+        }
     }
 }
 
@@ -244,6 +305,14 @@ Hooks.on('getSceneControlButtons', (controls) => {
                 toggle: true,
                 active: setting('mirror-movement'),
                 onClick: MonksCommonDisplay.toggleMirrorScreen
+            },
+            {
+                name: "mirror-selection",
+                title: "MonksCommonDisplay.mirror-selection",
+                icon: "far fa-object-group",
+                toggle: true,
+                active: setting('mirror-token-selection'),
+                onClick: MonksCommonDisplay.toggleMirrorTokenSelection
             }
         ]
     });
