@@ -26,7 +26,8 @@ export class ControllerApp extends Application {
                     name: u.name,
                     img: u.avatar,
                     display: false,
-                    mirror: false
+                    mirror: false,
+                    selection: false
                 }, data);
             });
 
@@ -43,6 +44,7 @@ export class ControllerApp extends Application {
 
             data.display = $('.display', this).is(':checked');
             data.mirror = $('.mirror', this).is(':checked');
+            data.selection = $('.selection', this).is(':checked');
 
             playerdata[id] = data;
         });

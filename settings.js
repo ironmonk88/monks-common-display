@@ -30,6 +30,16 @@ export const registerSettings = function () {
 		default: true,
 		type: Boolean,
 	});
+
+	game.settings.register(modulename, "mirror-token-selection", {
+		name: i18n("MonksCommonDisplay.mirror-token-selection.name"),
+		hint: i18n("MonksCommonDisplay.mirror-token-selection.hint"),
+		scope: "world",
+		config: true,
+		default: true,
+		type: Boolean,
+	});
+
 	/*
 	game.settings.register(modulename, "show-mirror-tool", {
 		name: i18n("MonksCommonDisplay.show-mirror-tool.name"),
