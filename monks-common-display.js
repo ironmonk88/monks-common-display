@@ -198,9 +198,8 @@ export class MonksCommonDisplay {
     }
 
     static controlToken(data) {
-        if (!MonksCommonDisplay.playerdata.display || !MonksCommonDisplay.playerdata.selection) {
+        if (!MonksCommonDisplay.playerdata.display || !MonksCommonDisplay.playerdata.selection)
             return;
-        }
 
         const actor = game.actors.get(data[0]);
 
@@ -309,7 +308,7 @@ Hooks.on('getSceneControlButtons', (controls) => {
             {
                 name: "mirror-selection",
                 title: "MonksCommonDisplay.mirror-selection",
-                icon: "far fa-object-group",
+                icon: "fas fa-street-view",
                 toggle: true,
                 active: setting('mirror-token-selection'),
                 onClick: MonksCommonDisplay.toggleMirrorTokenSelection

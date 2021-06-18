@@ -1,3 +1,6 @@
+# Version 1.0.6
+Merged code to support token selection mirroring.  Thank you Jixxus for the code.
+
 # Version 1.0.5
 Fixed issues with the layer
 
