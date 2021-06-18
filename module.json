@@ -2,7 +2,7 @@
 	"name": "monks-common-display",
 	"title": "Monk's Common Display",
 	"description": "Set up a display without all the ui so that it can be displayed on an alternate screen",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"author": "IronMonk, ironmonk88#4075",
 	"socket": true,
 	"languages": [
@@ -20,7 +20,7 @@
 	"styles": [ "css/monks-common-display.css" ],
 	"packs": [],
 	"url": "https://github.com/ironmonk88/monks-common-display",
-	"download": "https://github.com/ironmonk88/monks-common-display/archive/1.0.6.zip",
+	"download": "https://github.com/ironmonk88/monks-common-display/archive/1.0.7.zip",
 	"manifest": "https://github.com/ironmonk88/monks-common-display/releases/latest/download/module.json",
 	"bugs": "https://github.com/ironmonk88/monks-common-display/issues",
 	"allowBugReporter": true,

@@ -1,3 +1,6 @@
+# Version 1.0.7
+Added option to include Assistant GM players in the list of players that can be used for the Common Display.
+
 # Version 1.0.6
 Merged code to support token selection mirroring.  Thank you Jixxus for the code.
 

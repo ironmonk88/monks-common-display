@@ -18,7 +18,8 @@ export class ControllerApp extends Application {
 
     getData(options) {
         let playerdata = setting('playerdata');
-        let players = game.users.filter(u => !u.isGM)
+        let players = game.users.filter(u =>
+            (setting('allow-gm-players') ? u.id != game.user.id && u.role < CONST.USER_ROLES.GAMEMASTER : !u.isGM))
             .map(u => {
                 let data = playerdata[u.id] || {};
                 return mergeObject({

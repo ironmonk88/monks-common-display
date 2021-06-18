@@ -72,6 +72,15 @@ export const registerSettings = function () {
 		}
 	});
 
+	game.settings.register(modulename, "allow-gm-players", {
+		name: i18n("MonksCommonDisplay.allow-gm-players.name"),
+		hint: i18n("MonksCommonDisplay.allow-gm-players.hint"),
+		scope: "world",
+		config: true,
+		default: false,
+		type: Boolean
+	});
+
 	game.settings.register(modulename, "startupdata", {
 		name: '',
 		hint: '',
