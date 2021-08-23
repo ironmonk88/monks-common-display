@@ -1,43 +1,48 @@
-body.hide-ui > *:not(#logo):not(#board):not(#hud):not(#confetti-canvas):not(#dice-box-canvas):not(#pause):not(#sidebar):not(#notifications):not(#loading):not(#narrator):not(#combat-popout):not(.image-popout):not(.journal-sheet):not(.journal-attached),
-body.hide-ui #hud > *:not(#image-hover-hud):not(#healthEstimate),
-body.hide-ui #sidebar > *:not(.sidebar-tab[data-tab="chat"]),
-body.hide-ui #sidebar .sidebar-tab[data-tab="chat"] > *:not(#chat-log),
+body.hide-ui > *:not(#logo):not(#board):not(#hud):not(#confetti-canvas):not(#dice-box-canvas):not(#pause):not(#sidebar):not(#notifications):not(#loading):not(#narrator):not(#combat-popout):not(.image-popout):not(.journal-sheet):not(.journal-attached):not(#slideshow-display):not(#slideshow-canvas), 
+body.hide-ui #hud > *:not(#image-hover-hud):not(#healthEstimate), 
+body.hide-ui #sidebar > *:not(.sidebar-tab[data-tab="chat"]), 
+body.hide-ui #sidebar .sidebar-tab[data-tab="chat"] > *:not(#chat-log), 
 body.hide-ui .image-popout > *:not(.window-content) {
     display: none !important;
-}
-
-body.hide-ui #combat-popout header,
-body.hide-ui #combat-popout .sidebar-tab header,
-body.hide-ui #combat-popout .sidebar-tab nav,
-body.hide-ui #combat-popout .sidebar-tab .combatant:not(.active) {
+} 
+body.hide-ui #combat-popout header, 
+body.hide-ui #combat-popout .sidebar-tab header, 
+body.hide-ui #combat-popout .sidebar-tab nav {
     display: none !important;
 }
-
+body.hide-ui:not(.show-combatants) #combat-popout .sidebar-tab .combatant:not(.active) {
+    display: none !important;
+}
 body.hide-ui #combat-popout {
     top: 2px !important;
     height: 70px !important;
     min-height: 70px !important;
 }
-
-body.hide-ui #combat-popout .sidebar-tab .combatant.active{
-    margin-top:3px;
+body.hide-ui.show-combatants #combat-popout {
+    height:unset !important;
+    min-height: unset !important;
+    max-height: 100%;
 }
+
+body.hide-ui #combat-popout .sidebar-tab .combatant.active {
+    margin-top: 3px;
+} 
 
 body.hide-ui #combat-popout .sidebar-tab .combatant.active > *:not(.token-image):not(.token-name):not(.ce-image-wrapper) {
     display: none !important;
-}
+} 
 
 body.hide-ui #combat-popout .sidebar-tab .combatant.active .token-name > *:not(h4) {
     display: none !important;
-}
+} 
 
 body.hide-ui #logo {
     opacity: 0.5;
-}
+} 
 
 body.hide-chat #sidebar{
     display:none !important;
-}
+} 
 
 .monks-common-display .sheet .items-list {
     list-style: none;
@@ -46,13 +51,13 @@ body.hide-chat #sidebar{
     overflow-y: auto;
     scrollbar-width: thin;
     color: #7a7971;
-}
+} 
 
 .monks-common-display .sheet .items-list .item-list {
     list-style: none;
     margin: 0;
     padding: 0;
-}
+} 
 
 .monks-common-display .sheet .items-list .item-name {
     flex: 1;
@@ -61,28 +66,27 @@ body.hide-chat #sidebar{
     font-size: 13px;
     text-align: left;
     align-items: center;
-}
+} 
 
-.monks-common-display .sheet .items-list .item-name h3,
-.monks-common-display .sheet .items-list .item-name h4 {
+.monks-common-display .sheet .items-list .item-name h3, .monks-common-display .sheet .items-list .item-name h4 {
     margin: 0;
     white-space: nowrap;
     overflow-x: hidden;
-}
+} 
 
 .monks-common-display .sheet .items-list .item {
     align-items: center;
     padding: 0 2px;
     border-bottom: 1px solid #c9c7b8;
-}
+} 
 
 .monks-common-display .sheet .items-list .item:last-child {
     border-bottom: none;
-}
+} 
 
 .monks-common-display .sheet .items-list .item .item-name {
     color: #191813;
-}
+} 
 
 .monks-common-display .sheet .items-list .item .item-name .item-image {
     flex: 0 0 30px;
@@ -95,21 +99,21 @@ body.hide-chat #sidebar{
     border: none;
     margin-right: 5px;
     text-align: center;
-}
+} 
 
 .window-content .monks-common-display .sheet .items-list .item .item-name .item-image {
     flex: 0 0 48px;
     width: 48px;
-}
+} 
 
 .monks-common-display .sheet .items-list .item-controls{
     flex: 0 0 90px;
     text-align:center;
-}
+} 
 
 .monks-common-display .sheet .items-list .item-controls > input{
     margin:auto;
-}
+} 
 
 .monks-common-display .sheet .items-list .items-header {
     height: 28px;
@@ -119,14 +123,14 @@ body.hide-chat #sidebar{
     background: rgba(0, 0, 0, 0.05);
     border: 2px groove #eeede0;
     font-weight: bold;
-}
+} 
 
 .monks-common-display .sheet .items-list .items-header .item-control {
     font-weight: normal;
     flex: 0 0 90px;
     font-size: 12px;
     text-align: center;
-}
+} 
 
 .monks-common-display .sheet .items-list .items-header h3 {
     padding-left: 5px;

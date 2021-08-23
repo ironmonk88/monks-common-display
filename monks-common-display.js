@@ -59,8 +59,7 @@ export class MonksCommonDisplay {
         if (game.user.isGM) {
             MonksCommonDisplay.initGM();
             MonksCommonDisplay.registerHotKeys();
-        }
-
+        } 
         game.socket.on('module.monks-common-display', MonksCommonDisplay.onMessage); 
     }
 
@@ -84,7 +83,7 @@ export class MonksCommonDisplay {
 
     static toggleCommonDisplay() {
         let display = MonksCommonDisplay.playerdata.display || false;
-        $('body').toggleClass('hide-ui', display).toggleClass('hide-chat', display && !setting('show-chat-log'));
+        $('body').toggleClass('hide-ui', display).toggleClass('hide-chat', display && !setting('show-chat-log')).toggleClass('show-combatants', setting('show-combatants'));
         if (display && ui.sidebar)
             ui.sidebar.activateTab('chat');
 

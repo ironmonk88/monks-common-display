@@ -81,6 +81,18 @@ export const registerSettings = function () {
 		type: Boolean
 	});
 
+	game.settings.register(modulename, "show-combatants", {
+		name: i18n("MonksCommonDisplay.show-combatants.name"),
+		hint: i18n("MonksCommonDisplay.show-combatants.hint"),
+		scope: "world",
+		config: true,
+		default: false,
+		type: Boolean,
+		onChange: () => {
+			MonksCommonDisplay.toggleCommonDisplay();
+		}
+	});
+
 	game.settings.register(modulename, "startupdata", {
 		name: '',
 		hint: '',

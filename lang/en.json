@@ -13,6 +13,8 @@
   "MonksCommonDisplay.show-chat-log.hint": "Show the side menu with the chat log displayed.",
   "MonksCommonDisplay.allow-gm-players.name": "Allow GM Players",
   "MonksCommonDisplay.allow-gm-players.hint": "Allow the selection of GM players to represent the Common Display",
+  "MonksCommonDisplay.show-combatants.name": "Show all combatants",
+  "MonksCommonDisplay.show-combatants.hint": "Instead of just show the active combatant, show the entire list",
 
   "MonksCommonDisplay.change-settings": "Change Settings",
   "MonksCommonDisplay.mirror-screen": "Mirror Screen",
