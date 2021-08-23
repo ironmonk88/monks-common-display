@@ -1,3 +1,8 @@
+# Version 1.0.8
+Added option to show all combatants not just the active one.
+
+Added update so that Enhanced Journal Slideshows will be displayed.
+
 # Version 1.0.7
 Added option to include Assistant GM players in the list of players that can be used for the Common Display.
 
