@@ -15,11 +15,13 @@
   "MonksCommonDisplay.allow-gm-players.hint": "Allow the selection of GM players to represent the Common Display",
   "MonksCommonDisplay.show-combatants.name": "Show all combatants",
   "MonksCommonDisplay.show-combatants.hint": "Instead of just show the active combatant, show the entire list",
+  "MonksCommonDisplay.limit-shown.name": "Limit shown combatants",
 
   "MonksCommonDisplay.change-settings": "Change Settings",
   "MonksCommonDisplay.mirror-screen": "Mirror Screen",
   "MonksCommonDisplay.mirror-selection": "Mirror Token Selection",
   "MonksCommonDisplay.clear-images": "Clear Images",
+  "MonksCommonDisplay.clear-journals": "Clear Journal Entries",
 
   "MonksCommonDisplay.players": "Players",
   "MonksCommonDisplay.display.name": "Display",

@@ -1,3 +1,13 @@
+# Version 1.0.9
+
+Added combat carosel support
+
+Automatically popout the combat display if the common display is reloaded and there's an active combat
+
+Added option to limit the number of combatants displayed when displaying all combatants, and scrolling the active combatant to the top.
+
+Added option to close all open journal entries.
+
 # Version 1.0.8
 Added option to show all combatants not just the active one.
 

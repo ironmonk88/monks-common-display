@@ -93,6 +93,22 @@ export const registerSettings = function () {
 		}
 	});
 
+	game.settings.register(modulename, "limit-shown", {
+		name: i18n("MonksCommonDisplay.limit-shown.name"),
+		scope: "world",
+		config: true,
+		range: {
+			min: 1,
+			max: 5,
+			step: 1,
+		},
+		default: 1,
+		type: Number,
+		onChange: () => {
+			MonksCommonDisplay.toggleCommonDisplay();
+		}
+	});
+
 	game.settings.register(modulename, "startupdata", {
 		name: '',
 		hint: '',

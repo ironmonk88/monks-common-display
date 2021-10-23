@@ -53,6 +53,7 @@ export class MonksCommonDisplay {
     }
 
     static ready() {
+        let display = MonksCommonDisplay.playerdata.display || false;
         //check to see if this is a display screen
         MonksCommonDisplay.dataChange();
 
@@ -60,7 +61,20 @@ export class MonksCommonDisplay {
             MonksCommonDisplay.initGM();
             MonksCommonDisplay.registerHotKeys();
         } 
-        game.socket.on('module.monks-common-display', MonksCommonDisplay.onMessage); 
+        game.socket.on('module.monks-common-display', MonksCommonDisplay.onMessage);
+
+        if (display && game.combats.active) {
+            ui.combat.renderPopout(ui.combat);
+            window.setTimeout(function () {
+                MonksCommonDisplay.setScrollTop();
+            }, 500);
+        }
+    }
+
+    static emit(action, args = {}) {
+        args.action = action;
+        args.senderId = game.user.id
+        game.socket.emit(MonksCommonDisplay.SOCKET, args, (resp) => { });
     }
 
     static dataChange() {
@@ -83,7 +97,11 @@ export class MonksCommonDisplay {
 
     static toggleCommonDisplay() {
         let display = MonksCommonDisplay.playerdata.display || false;
-        $('body').toggleClass('hide-ui', display).toggleClass('hide-chat', display && !setting('show-chat-log')).toggleClass('show-combatants', setting('show-combatants'));
+        $('body')
+            .toggleClass('hide-ui', display)
+            .toggleClass('hide-chat', display && !setting('show-chat-log'))
+            .toggleClass('show-combatants', setting('show-combatants'))
+            .attr('limit-combatants', setting('limit-shown'));
         if (display && ui.sidebar)
             ui.sidebar.activateTab('chat');
 
@@ -157,14 +175,14 @@ export class MonksCommonDisplay {
     static sendCanvasPan(data) {
         if (canvas.scene.active && setting("mirror-movement") && MonksCommonDisplay.isAnyDisplayPlayerLoggedIn()) {
             debug('pan data', data)
-            game.socket.emit(MonksCommonDisplay.SOCKET, { action: "canvasPan", args: [data] });
+            MonksCommonDisplay.emit("canvasPan", { args: [data] });
         }
     }
 
     static sendTokenSelection(data) {
         if (canvas.scene.active && setting("mirror-token-selection") && MonksCommonDisplay.isAnyDisplayPlayerLoggedIn()) {
             debug('selection data', data);
-            game.socket.emit(MonksCommonDisplay.SOCKET, { action: "controlToken", args: [data] });
+            MonksCommonDisplay.emit("controlToken", { args: [data] });
         }
     }
 
@@ -179,6 +197,7 @@ export class MonksCommonDisplay {
     }
 
     static onMessage(data) {
+        log('onMessage', data);
         MonksCommonDisplay[data.action].apply(MonksCommonDisplay, data.args)
     }
 
@@ -189,6 +208,14 @@ export class MonksCommonDisplay {
             $('.image-popout .header-button.close').click();
         }//else
         //    $('#app-' + id + ' .header-button.close').click(); //app-id isn't shared, I guess that should be obvious
+    }
+
+    static closeJournals(id) {
+        let user = game.users.find(u => u.id == id);
+        if (user || (id == undefined && MonksCommonDisplay.playerdata.display)) {
+            //find a journal window
+            $('.app.journal-sheet .header-button.close').click();
+        }
     }
 
     static canvasPan(data) {
@@ -202,7 +229,7 @@ export class MonksCommonDisplay {
 
         const actor = game.actors.get(data[0]);
 
-        if (actor.owner) {
+        if (actor.isOwner) {
             const tokens = actor.getActiveTokens();
 
             for (const token of tokens) {
@@ -216,6 +243,13 @@ export class MonksCommonDisplay {
             }
         }
     }
+
+    static setScrollTop() {
+        let active = $('#combat-popout #combat-tracker li.active')[0];
+        log('Active', active, active?.offsetTop);
+        if (active)
+            $('#combat-popout #combat-tracker').scrollTop(active.offsetTop - (setting("limit-shown") > 2 ? 50 : 0));
+    }
 }
 
 Hooks.on('init', () => {
@@ -227,13 +261,20 @@ Hooks.on('ready', () => {
 });
 
 Hooks.on("updateCombat", function (combat, delta) {
-    if (MonksCommonDisplay.playerdata.display && setting("show-combat") && delta.round === 1 && combat.turn === 0 && combat.started === true) {
-        //new combat, pop it out
-        const tabApp = ui["combat"];
-        tabApp.renderPopout(tabApp);
+    if (MonksCommonDisplay.playerdata.display && setting("show-combat")) {
+        if (delta.round === 1 && combat.turn === 0 && combat.started === true) {
+            //new combat, pop it out
+            const tabApp = ui["combat"];
+            tabApp.renderPopout(tabApp);
 
-        if (ui.sidebar.activeTab !== "chat")
-            ui.sidebar.activateTab("chat");
+            if (ui.sidebar.activeTab !== "chat")
+                ui.sidebar.activateTab("chat");
+        }
+        if (setting("show-combatants") && setting("limit-shown") > 1) {
+            window.setTimeout(function () {
+                MonksCommonDisplay.setScrollTop();
+            }, 500);
+        }
     }
 });
 
@@ -288,13 +329,22 @@ Hooks.on('getSceneControlButtons', (controls) => {
                 name: 'controller',
                 title: "MonksCommonDisplay.change-settings",
                 icon: 'fas fa-chalkboard',
+                button: true,
                 onClick: () => { new ControllerApp().render(true); }
             },
             {
                 name: "clear-images",
                 title: "MonksCommonDisplay.clear-images",
-                icon: "fas fa-portrait",
-                onClick: () => { game.socket.emit(MonksCommonDisplay.SOCKET, { action: "closeImagePopout", args: [] }); }
+                icon: "fas fa-image",
+                button: true,
+                onClick: () => { MonksCommonDisplay.emit("closeImagePopout"); }
+            },
+            {
+                name: "clear-journals",
+                title: "MonksCommonDisplay.clear-journals",
+                icon: "fas fa-book-open",
+                button: true,
+                onClick: () => { MonksCommonDisplay.emit("closeJournals"); }
             },
             {
                 name: "mirror-screen",

@@ -51,7 +51,7 @@ export class ControllerApp extends Application {
         });
 
         game.settings.set('monks-common-display', 'playerdata', playerdata).then(() => {
-            game.socket.emit(MonksCommonDisplay.SOCKET, { action: "dataChange", args: [] });
+            MonksCommonDisplay.emit("dataChange");
         });
 
         this.close();
