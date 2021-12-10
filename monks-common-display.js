@@ -100,6 +100,7 @@ export class MonksCommonDisplay {
         $('body')
             .toggleClass('hide-ui', display)
             .toggleClass('hide-chat', display && !setting('show-chat-log'))
+            .toggleClass('hide-camera-views', display && !setting('show-camera-views'))
             .toggleClass('show-combatants', setting('show-combatants'))
             .attr('limit-combatants', setting('limit-shown'));
         if (display && ui.sidebar)

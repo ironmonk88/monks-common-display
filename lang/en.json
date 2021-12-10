@@ -11,6 +11,8 @@
   "MonksCommonDisplay.show-mirror-tool.hint": "Show the mirror tool with the token tools",
   "MonksCommonDisplay.show-chat-log.name": "Show Chat log",
   "MonksCommonDisplay.show-chat-log.hint": "Show the side menu with the chat log displayed.",
+  "MonksCommonDisplay.show-camera-views.name": "Show Camera Views",
+  "MonksCommonDisplay.show-camera-views.hint": "Show the web camera views when video integration is enabled.",
   "MonksCommonDisplay.allow-gm-players.name": "Allow GM Players",
   "MonksCommonDisplay.allow-gm-players.hint": "Allow the selection of GM players to represent the Common Display",
   "MonksCommonDisplay.show-combatants.name": "Show all combatants",

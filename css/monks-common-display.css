@@ -1,4 +1,4 @@
-body.hide-ui > *:not(#logo):not(#board):not(#hud):not(#confetti-canvas):not(#dice-box-canvas):not(#pause):not(#sidebar):not(#notifications):not(#loading):not(#narrator):not(#combat-popout):not(.image-popout):not(.journal-sheet):not(.journal-attached):not(#slideshow-display):not(#slideshow-canvas):not(#combat-carousel),
+body.hide-ui > *:not(#logo):not(#board):not(#hud):not(#confetti-canvas):not(#dice-box-canvas):not(#pause):not(#sidebar):not(#notifications):not(#loading):not(#narrator):not(#combat-popout):not(.image-popout):not(.journal-sheet):not(.journal-attached):not(#slideshow-display):not(#slideshow-canvas):not(#combat-carousel):not(#camera-views),
 body.hide-ui #hud > *:not(#image-hover-hud):not(#healthEstimate),
 body.hide-ui #sidebar > *:not(.sidebar-tab[data-tab="chat"]),
 body.hide-ui #sidebar .sidebar-tab[data-tab="chat"] > *:not(#chat-log),
@@ -60,6 +60,10 @@ body.hide-ui #logo {
 body.hide-chat #sidebar{
     display:none !important;
 } 
+
+body.hide-camera-views #camera-views{
+    display:none !important;
+}
 
 .monks-common-display .sheet .items-list {
     list-style: none;
