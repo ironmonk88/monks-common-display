@@ -2,9 +2,15 @@
 	"name": "monks-common-display",
 	"title": "Monk's Common Display",
 	"description": "Set up a display without all the ui so that it can be displayed on an alternate screen",
-	"version": "1.0.9",
+	"version": "1.0.10",
+	"minimumCoreVersion": "9",
+	"compatibleCoreVersion": "9.236",
 	"author": "IronMonk",
-	"authors": ["IronMonk", "ironmonk88#4075"],
+	"authors": [{
+		"name": "IronMonk",
+		"discord": "ironmonk88#4075",
+		"patreon": "https://www.patreon.com/ironmonk"
+    }],
 	"socket": true,
 	"languages": [
 		{
@@ -17,14 +23,11 @@
 		"monks-common-screen.js",
 		"settings.js"
 	],
-	"dependencies": [ { "name": "lib-df-hotkeys" } ],
 	"styles": [ "css/monks-common-display.css" ],
 	"packs": [],
 	"url": "https://github.com/ironmonk88/monks-common-display",
-	"download": "https://github.com/ironmonk88/monks-common-display/archive/1.0.9.zip",
+	"download": "https://github.com/ironmonk88/monks-common-display/archive/1.0.10.zip",
 	"manifest": "https://github.com/ironmonk88/monks-common-display/releases/latest/download/module.json",
 	"bugs": "https://github.com/ironmonk88/monks-common-display/issues",
-	"allowBugReporter": true,
-	"minimumCoreVersion": "0.8.0",
-	"compatibleCoreVersion": "0.8.9"
+	"allowBugReporter": true
 }

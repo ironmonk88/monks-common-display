@@ -4,6 +4,7 @@ export const registerSettings = function () {
     // Register any custom module settings here
 	let modulename = "monks-common-display";
 
+	/*
 	game.settings.registerMenu(modulename, 'hot-keys', {
 		name: 'Change Hotkeys',
 		label: 'Change Hotkeys',
@@ -11,7 +12,7 @@ export const registerSettings = function () {
 		icon: 'fas fa-keyboard',
 		restricted: true,
 		type: Hotkeys.createConfig('Monks Common Display', ['monks-common-display'])
-	});
+	});*/
 
 	/*
 	game.settings.register(modulename, "display-players", {

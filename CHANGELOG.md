@@ -1,3 +1,7 @@
+# Version 1.0.10
+
+Adding v9 support, which boils down to hotkey support and changes with how the layer is registered
+
 # Version 1.0.9
 
 Added combat carosel support
