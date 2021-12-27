@@ -1,3 +1,7 @@
+# Version 1.0.11
+
+Fixed some v9 styling changes that was preventing the chat log from being revealed.
+
 # Version 1.0.10
 
 Adding v9 support, which boils down to hotkey support and changes with how the layer is registered

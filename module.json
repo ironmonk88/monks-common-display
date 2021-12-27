@@ -2,9 +2,9 @@
 	"name": "monks-common-display",
 	"title": "Monk's Common Display",
 	"description": "Set up a display without all the ui so that it can be displayed on an alternate screen",
-	"version": "1.0.10",
+	"version": "1.0.11",
 	"minimumCoreVersion": "9",
-	"compatibleCoreVersion": "9.236",
+	"compatibleCoreVersion": "9",
 	"author": "IronMonk",
 	"authors": [{
 		"name": "IronMonk",
@@ -26,7 +26,7 @@
 	"styles": [ "css/monks-common-display.css" ],
 	"packs": [],
 	"url": "https://github.com/ironmonk88/monks-common-display",
-	"download": "https://github.com/ironmonk88/monks-common-display/archive/1.0.10.zip",
+	"download": "https://github.com/ironmonk88/monks-common-display/archive/1.0.11.zip",
 	"manifest": "https://github.com/ironmonk88/monks-common-display/releases/latest/download/module.json",
 	"bugs": "https://github.com/ironmonk88/monks-common-display/issues",
 	"allowBugReporter": true
