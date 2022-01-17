@@ -7,6 +7,10 @@ export class MonksCommonDisplayLayer extends CanvasLayer {
         return mergeObject(super.layerOptions, {
             objectClass: Note,
             sheetClass: NoteConfig,
+            sheetClasses: {
+                base: {
+                }
+            },
             canDragCreate: false,
             zIndex: 180
         });

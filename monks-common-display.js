@@ -21,7 +21,7 @@ export let combatposition = () => {
 };
 
 function registerLayer() {
-    CONFIG.Canvas.layers.MonksCommonDisplayLayer = MonksCommonDisplayLayer;
+    CONFIG.Canvas.layers.MonksCommonDisplayLayer = { group: "interface", layerClass: MonksCommonDisplayLayer };
     CONFIG.MonksCommonDisplayLayer = {
         documentClass: null,
         layerClass: MonksCommonDisplayLayer,
@@ -45,6 +45,8 @@ export class MonksCommonDisplay {
         MonksCommonDisplay.SOCKET = "module.monks-common-display";
 
         registerSettings();
+        MonksCommonDisplay.registerHotKeys();
+
         //this is so the screen starts up with the correct information, it'll be altered once the players are actually loaded
         this.playerdata.display = setting('startupdata');
         MonksCommonDisplay.toggleCommonDisplay();
@@ -59,7 +61,6 @@ export class MonksCommonDisplay {
 
         if (game.user.isGM) {
             MonksCommonDisplay.initGM();
-            MonksCommonDisplay.registerHotKeys();
         } 
         game.socket.on('module.monks-common-display', MonksCommonDisplay.onMessage);
 
@@ -130,28 +131,17 @@ export class MonksCommonDisplay {
     }
 
     static registerHotKeys() {
-        Hotkeys.registerGroup({
-            name: 'monks-common-display.hotkeys',
-            label: 'Monks Common Display',
-            description: "Monk's Common Display Hotkeys"
-        });
-
-        Hotkeys.registerShortcut({
-            name: `monks-common-display_mirror-screen`,
-            label: `Toggle Mirror Screen`,
-            group: 'monks-common-display.hotkeys',
-            default: () => { return { key: Hotkeys.keys.KeyM, alt: false, ctrl: false, shift: false }; },
-            onKeyDown: (e) => {
+        game.keybindings.register('monks-common-display', 'mirror-screen', {
+            name: 'Toggle Mirror Screen',
+            editable: [{ key: 'KeyM' }],
+            onDown: () => {
                 MonksCommonDisplay.toggleMirrorScreen();
             }
         });
-
-        Hotkeys.registerShortcut({
-            name: `monks-common-display_mirror-selection`,
-            label: `Toggle Mirror Token Selection`,
-            group: 'monks-common-display.hotkeys',
-            default: () => { return { key: Hotkeys.keys.KeyN, alt: false, ctrl: false, shift: false }; },
-            onKeyDown: (e) => {
+        game.keybindings.register('monks-common-display', 'mirror-selection', {
+            name: 'Toggle Mirror Token Selection',
+            editable: [{ key: 'KeyN' }],
+            onDown: () => {
                 MonksCommonDisplay.toggleMirrorTokenSelection();
             }
         });
