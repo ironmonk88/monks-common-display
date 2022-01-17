@@ -16,6 +16,8 @@
   "MonksCommonDisplay.show-combatants.name": "Show all combatants",
   "MonksCommonDisplay.show-combatants.hint": "Instead of just show the active combatant, show the entire list",
   "MonksCommonDisplay.limit-shown.name": "Limit shown combatants",
+  "MonksCommonDisplay.combat-scale.name": "Combat Scale",
+  "MonksCommonDisplay.combat-scale.hint": "Scale the size of the combat UI smaller or larger",
 
   "MonksCommonDisplay.change-settings": "Change Settings",
   "MonksCommonDisplay.mirror-screen": "Mirror Screen",
