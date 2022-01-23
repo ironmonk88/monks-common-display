@@ -61,6 +61,17 @@ export const registerSettings = function () {
 			MonksCommonDisplay.toggleCommonDisplay();
 		}
 	});
+	game.settings.register(modulename, "show-camera-views", {
+		name: i18n("MonksCommonDisplay.show-camera-views.name"),
+		hint: i18n("MonksCommonDisplay.show-camera-views.hint"),
+		scope: "world",
+		config: true,
+		default: false,
+		type: Boolean,
+		onChange: () => {
+			MonksCommonDisplay.toggleCommonDisplay();
+		}
+	});
 	game.settings.register(modulename, "show-combat", {
 		name: i18n("MonksCommonDisplay.show-combat.name"),
 		hint: i18n("MonksCommonDisplay.show-combat.hint"),
