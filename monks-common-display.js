@@ -106,7 +106,7 @@ export class MonksCommonDisplay {
             .attr('limit-combatants', setting('limit-shown'));
         if (display && ui.sidebar)
             ui.sidebar.activateTab('chat');
-
+        $("body").get(0).style.setProperty("--combat-popout-scale", display ? setting('combat-scale') : 1);
         //$('#sidebar').toggle(setting('show-chat-log') || !display);
     }
 

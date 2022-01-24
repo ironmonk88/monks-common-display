@@ -121,6 +121,23 @@ export const registerSettings = function () {
 		}
 	});
 
+	game.settings.register(modulename, "combat-scale", {
+		name: i18n("MonksCommonDisplay.combat-scale.name"),
+		hint: i18n("MonksCommonDisplay.combat-scale.hint"),
+		scope: "world",
+		config: true,
+		range: {
+			min: 0.1,
+			max: 5,
+			step: 0.1,
+		},
+		default: 1,
+		type: Number,
+		onChange: () => {
+			MonksCommonDisplay.toggleCommonDisplay();
+		}
+	});
+
 	game.settings.register(modulename, "startupdata", {
 		name: '',
 		hint: '',

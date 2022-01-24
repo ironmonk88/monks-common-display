@@ -1,3 +1,9 @@
+# Version 1.0.12
+
+Added support for levels 3D and chat videos, thank you vexofp for the code update
+
+Added support for scaling the combat tracker, thank you vexofp
+
 # Version 1.0.11
 
 Fixed some v9 styling changes that was preventing the chat log from being revealed.
