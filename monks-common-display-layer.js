@@ -1,4 +1,4 @@
-export class MonksCommonDisplayLayer extends CanvasLayer {
+export class MonksCommonDisplayLayer extends InteractionLayer {
     constructor() {
         super();
     }

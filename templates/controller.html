@@ -39,8 +39,9 @@
                             <div class="item-controls flexrow">
                                 <input type="checkbox" {{#if this.selection}}checked{{/if}} class="selection" />
                             </div>
-                            <div class="item-controls flexrow">
-                                <a class="item-control clear" title="{{localize 'MonksCommonDisplay.clear-images'}}"><i class="fas fa-trash"></i></a>
+                            <div class="item-controls flexrow" style="justify-content: center;">
+                                <a class="item-control clear-images" title="{{localize 'MonksCommonDisplay.clear-images'}}"><i class="fas fa-image"></i></a>
+                                <a class="item-control clear-journals" title="{{localize 'MonksCommonDisplay.clear-journals'}}"><i class="fas fa-book-open"></i></a>
                             </div>
                         </li>
                         {{/each}}
@@ -49,6 +50,7 @@
             </div>
         </form>
     </div>
+    <hr style="width: 100%;flex: 0 0 1px;" />
     <div class="dialog-buttons" style="flex: 0 0 30px;">
         <button type="submit" name="submit" class="dialog-buttons save" data-button="request"><i class="far fa-save"></i> {{localize 'MonksCommonDisplay.save'}}</button>
     </div>

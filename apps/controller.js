@@ -11,7 +11,7 @@ export class ControllerApp extends Application {
             title: "Monks Common Display",
             template: "./modules/monks-common-display/templates/controller.html",
             width: 600,
-            height: 400,
+            height: "auto",
             popOut: true
         });
     }
@@ -57,11 +57,11 @@ export class ControllerApp extends Application {
         this.close();
     }
 
-    clearWindows(event) {
+    clearWindows(type, event) {
         //find the player
         let id = $(event.currentTarget).parents('.item').get(0).dataset.itemId;
         //send them a request to clear windows
-        game.socket.emit(MonksCommonDisplay.SOCKET, { action: "closeImagePopout", args: [id] });
+        game.socket.emit(MonksCommonDisplay.SOCKET, { action: (type == "images" ? "closeImagePopout" : "closeJournals"), args: [id] });
     }
 
     activateListeners(html) {
@@ -69,6 +69,7 @@ export class ControllerApp extends Application {
         var that = this;
 
         $('.dialog-buttons.save', html).click($.proxy(this.saveData, this));
-        $('.item-control.clear', html).click($.proxy(this.clearWindows, this));
+        $('.item-control.clear-images', html).click($.proxy(this.clearWindows, this, "images"));
+        $('.item-control.clear-journals', html).click($.proxy(this.clearWindows, this, "journals"));
     };
 }

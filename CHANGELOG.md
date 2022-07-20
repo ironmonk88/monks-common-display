@@ -1,3 +1,7 @@
+# Version 1.0.14
+
+Added v10 support.
+
 # Version 1.0.12
 
 Added support for levels 3D and chat videos, thank you vexofp for the code update

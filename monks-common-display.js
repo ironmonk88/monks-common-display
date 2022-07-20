@@ -21,12 +21,13 @@ export let combatposition = () => {
 };
 
 function registerLayer() {
-    CONFIG.Canvas.layers.MonksCommonDisplayLayer = { group: "interface", layerClass: MonksCommonDisplayLayer };
+    CONFIG.Canvas.layers.monkscommondisplay = { group: "interface", layerClass: MonksCommonDisplayLayer };
     CONFIG.MonksCommonDisplayLayer = {
         documentClass: null,
         layerClass: MonksCommonDisplayLayer,
-        sheetClass: NoteConfig,
-        objectClass: Note
+        prototypeSheetClass: NoteConfig,
+        objectClass: Note,
+        sheetClasses: {}
     };
     /*
     const layers = mergeObject(Canvas.layers, {
@@ -62,7 +63,7 @@ export class MonksCommonDisplay {
         if (game.user.isGM) {
             MonksCommonDisplay.initGM();
         } 
-        game.socket.on('module.monks-common-display', MonksCommonDisplay.onMessage);
+        game.socket.on(MonksCommonDisplay.SOCKET, MonksCommonDisplay.onMessage);
 
         if (display && game.combats.active) {
             ui.combat.renderPopout(ui.combat);
@@ -153,7 +154,7 @@ export class MonksCommonDisplay {
         });
 
         Hooks.on("controlToken", (token, control) => {
-            MonksCommonDisplay.sendTokenSelection([token.data.actorId, control]);
+            MonksCommonDisplay.sendTokenSelection([token.actor.id, control]);
         });
 
         //I've temporarily removed this as the app-id isn't the same
@@ -314,7 +315,7 @@ Hooks.on('getSceneControlButtons', (controls) => {
         title: "Monks Common Display",
         icon: 'fas fa-chalkboard-teacher',
         visible: game.user.isGM,
-        layer: "MonksCommonDisplayLayer",
+        layer: "monkscommondisplay",
         tools: [
             {
                 name: 'controller',

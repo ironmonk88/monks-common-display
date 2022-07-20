@@ -83,12 +83,14 @@ body.hide-camera-views #camera-views{
     overflow-y: auto;
     scrollbar-width: thin;
     color: #7a7971;
-} 
+}
 
 .monks-common-display .sheet .items-list .item-list {
     list-style: none;
     margin: 0;
     padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
 } 
 
 .monks-common-display .sheet .items-list .item-name {
@@ -138,13 +140,17 @@ body.hide-camera-views #camera-views{
     width: 48px;
 } 
 
-.monks-common-display .sheet .items-list .item-controls{
+.monks-common-display .sheet .items-list .item-controls {
     flex: 0 0 90px;
     text-align:center;
-} 
+}
 
-.monks-common-display .sheet .items-list .item-controls > input{
-    margin:auto;
+.monks-common-display .sheet .items-list .item-controls .item-control {
+    flex: 0 0 25px;
+}
+
+.monks-common-display .sheet .items-list .item-controls > input {
+    margin: auto;
 } 
 
 .monks-common-display .sheet .items-list .items-header {

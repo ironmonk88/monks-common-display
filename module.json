@@ -1,33 +1,41 @@
 {
-	"name": "monks-common-display",
-	"title": "Monk's Common Display",
-	"description": "Set up a display without all the ui so that it can be displayed on an alternate screen",
-	"version": "1.0.12",
-	"minimumCoreVersion": "9",
-	"compatibleCoreVersion": "9",
-	"author": "IronMonk",
-	"authors": [{
-		"name": "IronMonk",
-		"discord": "ironmonk88#4075",
-		"patreon": "https://www.patreon.com/ironmonk"
-    }],
-	"socket": true,
-	"languages": [
-		{
-			"lang": "en",
-			"name": "English",
-			"path": "lang/en.json"
-		}
-	],
-	"esmodules": [
-		"monks-common-screen.js",
-		"settings.js"
-	],
-	"styles": [ "css/monks-common-display.css" ],
-	"packs": [],
-	"url": "https://github.com/ironmonk88/monks-common-display",
-	"download": "https://github.com/ironmonk88/monks-common-display/archive/1.0.12.zip",
-	"manifest": "https://github.com/ironmonk88/monks-common-display/releases/latest/download/module.json",
-	"bugs": "https://github.com/ironmonk88/monks-common-display/issues",
-	"allowBugReporter": true
+  "title": "Monk's Common Display",
+  "description": "Set up a display without all the ui so that it can be displayed on an alternate screen",
+  "version": "1.0.14",
+  "socket": true,
+  "authors": [
+    {
+      "name": "IronMonk",
+      "discord": "ironmonk88#4075",
+      "patreon": "https://www.patreon.com/ironmonk",
+      "ko-fi": "https://ko-fi.com/ironmonk88"
+    }
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "esmodules": [
+    "monks-common-display.js",
+    "settings.js"
+  ],
+  "styles": [
+    "css/monks-common-display.css"
+  ],
+  "url": "https://github.com/ironmonk88/monks-common-display",
+  "download": "https://github.com/ironmonk88/monks-common-display/archive/1.0.14.zip",
+  "manifest": "https://github.com/ironmonk88/monks-common-display/releases/latest/download/module.json",
+  "bugs": "https://github.com/ironmonk88/monks-common-display/issues",
+  "allowBugReporter": true,
+  "id": "monks-common-display",
+  "compatibility": {
+    "minimum": "10",
+    "verified": "10"
+  },
+  "name": "monks-common-display",
+  "minimumCoreVersion": "10",
+  "compatibleCoreVersion": "10"
 }
