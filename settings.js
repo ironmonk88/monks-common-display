@@ -1,55 +1,24 @@
 import { MonksCommonDisplay, i18n } from "./monks-common-display.js";
+import { ControllerApp } from "./apps/controller.js"
 
 export const registerSettings = function () {
     // Register any custom module settings here
 	let modulename = "monks-common-display";
 
-	/*
-	game.settings.registerMenu(modulename, 'hot-keys', {
-		name: 'Change Hotkeys',
-		label: 'Change Hotkeys',
-		hint: 'Change the hotkeys that this module uses',
-		icon: 'fas fa-keyboard',
+	const debouncedReload = foundry.utils.debounce(function () { window.location.reload(); }, 100);
+
+	game.settings.registerMenu(modulename, 'configure', {
+		name: 'Configure Common Display',
+		label: 'Configure Common Display',
+		hint: 'Configure what player is used for the common display.',
+		icon: 'fas fa-chalkboard-teacher',
 		restricted: true,
-		type: Hotkeys.createConfig('Monks Common Display', ['monks-common-display'])
-	});*/
-
-	/*
-	game.settings.register(modulename, "display-players", {
-		name: i18n("MonksCommonDisplay.display-players.name"),
-		hint: i18n("MonksCommonDisplay.display-players.hint"),
-		scope: "world",
-		config: true,
-		default: "",
-		type: String,
-	});*/
-	game.settings.register(modulename, "mirror-movement", {
-		name: i18n("MonksCommonDisplay.mirror-movement.name"),
-		hint: i18n("MonksCommonDisplay.mirror-movement.hint"),
-		scope: "world",
-		config: true,
-		default: true,
-		type: Boolean,
+		type: ControllerApp,
+		onClick: (value) => {
+			log('Reset position');
+		}
 	});
 
-	game.settings.register(modulename, "mirror-token-selection", {
-		name: i18n("MonksCommonDisplay.mirror-token-selection.name"),
-		hint: i18n("MonksCommonDisplay.mirror-token-selection.hint"),
-		scope: "world",
-		config: true,
-		default: true,
-		type: Boolean,
-	});
-
-	/*
-	game.settings.register(modulename, "show-mirror-tool", {
-		name: i18n("MonksCommonDisplay.show-mirror-tool.name"),
-		hint: i18n("MonksCommonDisplay.show-mirror-tool.hint"),
-		scope: "world",
-		config: true,
-		default: true,
-		type: Boolean,
-	});*/
 	game.settings.register(modulename, "show-chat-log", {
 		name: i18n("MonksCommonDisplay.show-chat-log.name"),
 		hint: i18n("MonksCommonDisplay.show-chat-log.hint"),
@@ -138,9 +107,31 @@ export const registerSettings = function () {
 		}
 	});
 
+	game.settings.register(modulename, "close-after", {
+		name: i18n("MonksCommonDisplay.close-after.name"),
+		hint: i18n("MonksCommonDisplay.close-after.hint"),
+		scope: "world",
+		config: true,
+		range: {
+			min: 0,
+			max: 60,
+			step: 1,
+		},
+		default: 10,
+		type: Number
+	});
+
+	game.settings.register(modulename, "show-vertical", {
+		name: game.i18n.localize("MonksTokenBar.show-vertical.name"),
+		hint: game.i18n.localize("MonksTokenBar.show-vertical.hint"),
+		scope: "world",
+		config: false,
+		default: false,
+		type: Boolean,
+		onChange: debouncedReload
+	});
+
 	game.settings.register(modulename, "startupdata", {
-		name: '',
-		hint: '',
 		scope: "client",
 		config: false,
 		default: false,
@@ -148,11 +139,47 @@ export const registerSettings = function () {
 	});
 
 	game.settings.register(modulename, "playerdata", {
-		name: '',
-		hint: '',
 		scope: "world",
 		config: false,
 		default: {},
 		type: Object,
+	});
+
+	game.settings.register(modulename, "show-toolbar", {
+		scope: "client",
+		config: false,
+		default: false,
+		type: Boolean,
+	});
+
+	/*
+	 * //These settings should be per scene
+	game.settings.register(modulename, "screen", {
+		scope: "world",
+		config: false,
+		default: "gm",
+		type: String,
+	});
+
+	game.settings.register(modulename, "focus", {
+		scope: "world",
+		config: false,
+		default: "gm",
+		type: String,
+	});
+	*/
+
+	game.settings.register(modulename, "screen-toggle", {
+		scope: "world",
+		config: false,
+		default: false,
+		type: Boolean,
+	});
+
+	game.settings.register(modulename, "focus-toggle", {
+		scope: "world",
+		config: false,
+		default: false,
+		type: Boolean,
 	});
 };

@@ -1,6 +1,6 @@
 import { MonksCommonDisplay, log, i18n, setting } from "../monks-common-display.js";
 
-export class ControllerApp extends Application {
+export class ControllerApp extends FormApplication {
     constructor(options = {}) {
         super(options);
     }
@@ -10,7 +10,7 @@ export class ControllerApp extends Application {
             id: "monkscommondisplay",
             title: "Monks Common Display",
             template: "./modules/monks-common-display/templates/controller.html",
-            width: 600,
+            width: 400,
             height: "auto",
             popOut: true
         });
@@ -44,8 +44,6 @@ export class ControllerApp extends Application {
             let data = playerdata[id] || {};
 
             data.display = $('.display', this).is(':checked');
-            data.mirror = $('.mirror', this).is(':checked');
-            data.selection = $('.selection', this).is(':checked');
 
             playerdata[id] = data;
         });
@@ -57,19 +55,10 @@ export class ControllerApp extends Application {
         this.close();
     }
 
-    clearWindows(type, event) {
-        //find the player
-        let id = $(event.currentTarget).parents('.item').get(0).dataset.itemId;
-        //send them a request to clear windows
-        game.socket.emit(MonksCommonDisplay.SOCKET, { action: (type == "images" ? "closeImagePopout" : "closeJournals"), args: [id] });
-    }
-
     activateListeners(html) {
         super.activateListeners(html);
         var that = this;
 
         $('.dialog-buttons.save', html).click($.proxy(this.saveData, this));
-        $('.item-control.clear-images', html).click($.proxy(this.clearWindows, this, "images"));
-        $('.item-control.clear-journals', html).click($.proxy(this.clearWindows, this, "journals"));
     };
 }

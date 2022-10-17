@@ -1,3 +1,17 @@
+# Version 10.1
+
+Totally updated the interface.  
+You can now show a control bar that lets you select if you want the display screen to mirror, the GM, mirror the current combatant, or mirror a specific token.
+You can also set which token has control focus on it.  The one the current GM has selected, the current combatant, or a specific token.
+
+You can toggle if you want either the screen or focus to be active by clicking on the image, and you can change the type of each by right clicking.
+
+The settings to turn a player into the common display is now in the settings.  And the toggle on the toolbar opens up the window with all the controls.
+
+You can also toggle a player being the Common Display by right clicking on the player name in the player list and selecting "Show As Common Display"
+
+You can also clear all images and all journals from buttons on the control window, and you can set shared images to clear after a certain number of seconds.
+
 # Version 1.0.14
 
 Added v10 support.

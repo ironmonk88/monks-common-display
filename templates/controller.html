@@ -4,18 +4,9 @@
             <div class="sheet">
                 <ol class="items-list inventory-list">
                     <li class="items-header flexrow">
-                        <h3 class="item-name flexrow" style="margin-right:auto;">{{localize 'MonksCommonDisplay.players'}}</h3>
+                        <h3 class="item-name flexrow noborder" style="margin-right:auto;">{{localize 'MonksCommonDisplay.players'}}</h3>
                         <div class="item-control" title="{{localize 'MonksCommonDisplay.display.hint'}}">
                             {{localize 'MonksCommonDisplay.display.name'}}
-                        </div>
-                        <div class="item-control" title="{{localize 'MonksCommonDisplay.mirror.hint'}}">
-                            {{localize 'MonksCommonDisplay.mirror.name'}}
-                        </div>
-                        <div class="item-control" title="{{localize 'MonksCommonDisplay.selection.hint'}}">
-                            {{localize 'MonksCommonDisplay.selection.name'}}
-                        </div>
-                        <div class="item-control" title="{{localize 'MonksCommonDisplay.clear.hint'}}">
-                            {{localize 'MonksCommonDisplay.clear.name'}}
                         </div>
                     </li>
 
@@ -32,16 +23,6 @@
                             </div>
                             <div class="item-controls flexrow">
                                 <input type="checkbox" {{#if this.display}}checked{{/if}} class="display" />
-                            </div>
-                            <div class="item-controls flexrow">
-                                <input type="checkbox" {{#if this.mirror}}checked{{/if}} class="mirror" />
-                            </div>
-                            <div class="item-controls flexrow">
-                                <input type="checkbox" {{#if this.selection}}checked{{/if}} class="selection" />
-                            </div>
-                            <div class="item-controls flexrow" style="justify-content: center;">
-                                <a class="item-control clear-images" title="{{localize 'MonksCommonDisplay.clear-images'}}"><i class="fas fa-image"></i></a>
-                                <a class="item-control clear-journals" title="{{localize 'MonksCommonDisplay.clear-journals'}}"><i class="fas fa-book-open"></i></a>
                             </div>
                         </li>
                         {{/each}}
