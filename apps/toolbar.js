@@ -258,7 +258,7 @@ export class CommonToolbar extends Application {
         return [
             {
                 name: "GM",
-                icon: '<i class="fas fa-edit"></i>',
+                icon: '<i class="fas fa-user"></i>',
                 condition: game.user.isGM,
                 callback: async (btn) => {
                     MonksCommonDisplay.selectToken = null;
@@ -269,7 +269,7 @@ export class CommonToolbar extends Application {
             },
             {
                 name: "Combatant",
-                icon: '<i class="fas fa-edit"></i>',
+                icon: '<i class="fas fa-hand-fist"></i>',
                 condition: game.user.isGM,
                 callback: async (btn) => {
                     MonksCommonDisplay.selectToken = null;
@@ -280,7 +280,7 @@ export class CommonToolbar extends Application {
             },
             {
                 name: "Select a Token",
-                icon: '<i class="fas fa-edit"></i>',
+                icon: '<i class="fas fa-bullseye"></i>',
                 condition: game.user.isGM,
                 callback: btn => {
                     MonksCommonDisplay.selectToken = (!!MonksCommonDisplay.selectToken ? null : btn.data("action"));
