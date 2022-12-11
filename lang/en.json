@@ -22,6 +22,8 @@
   "MonksCommonDisplay.combat-scale.hint": "Scale the size of the combat UI smaller or larger",
   "MonksCommonDisplay.close-after.name": "Auto close popouts",
   "MonksCommonDisplay.close-after.hint": "Automatically close any windows that are popped out after (seconds)",
+  "MonksCommonDisplay.per-scene.name": "Setting per scene",
+  "MonksCommonDisplay.per-scene.hint": "Store the settings per scene so each scene can have different display",
 
   "MonksCommonDisplay.change-settings": "Change Settings",
   "MonksCommonDisplay.mirror-screen": "Mirror Screen",

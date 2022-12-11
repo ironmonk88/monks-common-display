@@ -1,11 +1,11 @@
-import { MonksCommonDisplay, i18n } from "./monks-common-display.js";
+import { MonksCommonDisplay, i18n, setting } from "./monks-common-display.js";
 import { ControllerApp } from "./apps/controller.js"
 
 export const registerSettings = function () {
     // Register any custom module settings here
 	let modulename = "monks-common-display";
 
-	const debouncedReload = foundry.utils.debounce(function () { window.location.reload(); }, 100);
+	const debouncedReload = foundry.utils.debounce(function () { window.location.reload(); }, 500);
 
 	game.settings.registerMenu(modulename, 'configure', {
 		name: 'Configure Common Display',
@@ -17,6 +17,31 @@ export const registerSettings = function () {
 		onClick: (value) => {
 			log('Reset position');
 		}
+	});
+
+	game.settings.register(modulename, "per-scene", {
+		name: i18n("MonksCommonDisplay.per-scene.name"),
+		hint: i18n("MonksCommonDisplay.per-scene.hint"),
+		scope: "world",
+		config: true,
+		default: false,
+		type: Boolean,
+		onChange: () => {
+			if (MonksCommonDisplay.toolbar && setting("show-toolbar") && game.user.isGM) {
+				MonksCommonDisplay.toolbar.render();
+			}
+			MonksCommonDisplay.screenChanged();
+			MonksCommonDisplay.focusChanged();
+		}
+	});
+
+	game.settings.register(modulename, "allow-gm-players", {
+		name: i18n("MonksCommonDisplay.allow-gm-players.name"),
+		hint: i18n("MonksCommonDisplay.allow-gm-players.hint"),
+		scope: "world",
+		config: true,
+		default: false,
+		type: Boolean
 	});
 
 	game.settings.register(modulename, "show-chat-log", {
@@ -53,15 +78,6 @@ export const registerSettings = function () {
 		}
 	});
 
-	game.settings.register(modulename, "allow-gm-players", {
-		name: i18n("MonksCommonDisplay.allow-gm-players.name"),
-		hint: i18n("MonksCommonDisplay.allow-gm-players.hint"),
-		scope: "world",
-		config: true,
-		default: false,
-		type: Boolean
-	});
-
 	game.settings.register(modulename, "show-combatants", {
 		name: i18n("MonksCommonDisplay.show-combatants.name"),
 		hint: i18n("MonksCommonDisplay.show-combatants.hint"),
@@ -90,6 +106,7 @@ export const registerSettings = function () {
 		}
 	});
 
+	/*
 	game.settings.register(modulename, "combat-scale", {
 		name: i18n("MonksCommonDisplay.combat-scale.name"),
 		hint: i18n("MonksCommonDisplay.combat-scale.hint"),
@@ -106,6 +123,7 @@ export const registerSettings = function () {
 			MonksCommonDisplay.toggleCommonDisplay();
 		}
 	});
+	*/
 
 	game.settings.register(modulename, "close-after", {
 		name: i18n("MonksCommonDisplay.close-after.name"),
@@ -152,8 +170,6 @@ export const registerSettings = function () {
 		type: Boolean,
 	});
 
-	/*
-	 * //These settings should be per scene
 	game.settings.register(modulename, "screen", {
 		scope: "world",
 		config: false,
@@ -167,7 +183,6 @@ export const registerSettings = function () {
 		default: "gm",
 		type: String,
 	});
-	*/
 
 	game.settings.register(modulename, "screen-toggle", {
 		scope: "world",

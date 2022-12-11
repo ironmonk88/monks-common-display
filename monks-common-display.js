@@ -45,17 +45,41 @@ function registerLayer() {
 export class MonksCommonDisplay {
     static playerdata = {};
     static windows = {};
+    static gmControlledTokens = new Set();
     static init() {
         MonksCommonDisplay.SOCKET = "module.monks-common-display";
 
         registerSettings();
         MonksCommonDisplay.registerHotKeys();
 
+        if (game.modules.get("lib-wrapper")?.active) {
+            libWrapper.ignore_conflicts("monks-common-display", "monks-active-tiles", "ActorDirectory.prototype._onClickDocumentName");
+        }
+
         //this is so the screen starts up with the correct information, it'll be altered once the players are actually loaded
         this.playerdata.display = setting('startupdata');
         MonksCommonDisplay.toggleCommonDisplay();
 
-        registerLayer();
+        //registerLayer();
+
+        let noteWarn = async function (wrapped, ...args) {
+            let [message, options] = args;
+
+            let display = MonksCommonDisplay.playerdata.display || false;
+            if (message == "TOKEN.WarningNoVision" && display)
+                return;
+
+            return wrapped(...args);
+        }
+
+        if (game.modules.get("lib-wrapper")?.active) {
+            libWrapper.register("monks-common-display", "Notifications.prototype.warn", noteWarn, "MIXED");
+        } else {
+            const oldNoteWarn = Notifications.prototype.warn;
+            Notifications.prototype.warn = function (event) {
+                return noteWarn.call(this, oldNoteWarn.bind(this), ...arguments);
+            }
+        }
 
         let checkShowImage = async function (wrapped, ...args) {
             let [src, data] = args;
@@ -81,6 +105,36 @@ export class MonksCommonDisplay {
             }
         }
 
+        let checkShareImage = async function (...args) {
+            let commonid = randomID();
+            game.socket.emit("shareImage", {
+                image: this.object,
+                title: this.options.title,
+                caption: this.options.caption,
+                uuid: this.options.uuid,
+                commonid: commonid
+            });
+            ui.notifications.info(game.i18n.format("JOURNAL.ActionShowSuccess", {
+                mode: "image",
+                title: this.options.title,
+                which: "all"
+            }));
+            let closeAfter = setting("close-after") ?? 0;
+            if (closeAfter != 0) {
+                window.setTimeout(() => {
+                    MonksCommonDisplay.emit("closeImage", { args: { id: commonid } });
+                }, closeAfter * 1000);
+            }
+        }
+
+        if (game.modules.get("lib-wrapper")?.active) {
+            libWrapper.register("monks-common-display", "ImagePopout.prototype.shareImage", checkShareImage, "OVERRIDE");
+        } else {
+            ImagePopout.prototype.shareImage = function (event) {
+                return checkShareImage.call(this, ...arguments);
+            }
+        }
+
         let handleShared = async function (wrapped, ...args) {
             let [options] = args;
             let ip = await wrapped(...args);
@@ -101,6 +155,36 @@ export class MonksCommonDisplay {
             }
         }
 
+        let clickDocumentName = async function (wrapped, ...args) {
+            let event = args[0];
+            if (!!MonksCommonDisplay.selectToken) {
+                event.preventDefault();
+                const documentId = event.currentTarget.closest(".document").dataset.documentId;
+
+                if (setting("per-scene")) {
+                    await canvas.scene.setFlag("monks-common-display", MonksCommonDisplay.selectToken, documentId);
+                    setProperty(canvas.scene, `flags.monks-common-display.${MonksCommonDisplay.selectToken}`, documentId);
+                } else {
+                    await game.settings.set("monks-common-display", MonksCommonDisplay.selectToken, documentId);
+                }
+
+                if (MonksCommonDisplay.selectToken == "screen") MonksCommonDisplay.screenChanged(); else MonksCommonDisplay.focusChanged();
+                MonksCommonDisplay.selectToken = null;
+                if (MonksCommonDisplay.toolbar && setting("show-toolbar") && game.user.isGM)
+                    MonksCommonDisplay.toolbar.render(true);
+            } else
+                wrapped(...args);
+        }
+
+        if (game.modules.get("lib-wrapper")?.active) {
+            libWrapper.register("monks-common-display", "ActorDirectory.prototype._onClickDocumentName", clickDocumentName, "MIXED");
+        } else {
+            const oldClickActorName = ActorDirectory.prototype._onClickDocumentName;
+            ActorDirectory.prototype._onClickDocumentName = function (event) {
+                return clickDocumentName.call(this, oldClickActorName.bind(this), ...arguments);
+            }
+        }
+
         /*
         let showEntry = async function (...args) {
             let entry = await fromUuid(uuid);
@@ -115,15 +199,15 @@ export class MonksCommonDisplay {
             else if (entry instanceof JournalEntry) entry.ownership[game.userId] = CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER;
             else return;
             if (!force && !entry.visible) return;
-
+    
             // Show the sheet with the appropriate mode
             entry.sheet.render(true, options);
-
+    
             if (options.commonid) {
                 MonksCommonDisplay.windows[options.commonid] = ip;
             }
         }
-
+    
         if (game.modules.get("lib-wrapper")?.active) {
             libWrapper.register("monks-common-display", "Journal.prototype.constructor._showEntry", showEntry, "OVERRIDE");
         } else {
@@ -167,6 +251,37 @@ export class MonksCommonDisplay {
                 return addConvertMenu.call(this, oldContext.bind(this), ...arguments);
             }
         }
+
+        let sceneView = async function (wrapped, ...args) {
+            let result = await wrapped.call(this, ...args);
+            if (MonksCommonDisplay.playerdata.display || false) {
+                
+                if (setting("screen-toggle")) {
+                    if (MonksCommonDisplay.screenValue == "gm")
+                        MonksCommonDisplay.emit("requestScreenPosition");
+                    else
+                        MonksCommonDisplay.changeScreen();
+                }
+                if (setting("focus-toggle")) {
+                    if (MonksCommonDisplay.screenValue == "gm")
+                        MonksCommonDisplay.emit("requestGMTokens");
+                    else
+                        MonksCommonDisplay.changeFocus();
+                }
+            } else if (game.user.isGM && setting("screen-toggle") && MonksCommonDisplay.screenValue == "gm" && canvas.scene.active)
+                MonksCommonDisplay.sendScreenMessage("canvasPan", game.canvas.scene._viewPosition);
+
+            return result;
+        }
+
+        if (game.modules.get("lib-wrapper")?.active) {
+            libWrapper.register("monks-common-display", "Scene.prototype.view", sceneView, "WRAPPER");
+        } else {
+            const oldSceneView = Scene.prototype.view;
+            Scene.prototype.view = function (event) {
+                return sceneView.call(this, oldSceneView.bind(this), ...arguments);
+            }
+        }
     }
 
     static ready() {
@@ -202,6 +317,16 @@ export class MonksCommonDisplay {
         game.socket.emit(MonksCommonDisplay.SOCKET, args, (resp) => { });
     }
 
+    static requestScreenPosition() {
+        if (game.user.isGM && canvas.scene.active && setting("screen-toggle") && MonksCommonDisplay.screenValue == "gm")
+            MonksCommonDisplay.sendScreenMessage("canvasPan", game.canvas.scene._viewPosition);
+    }
+
+    static requestGMTokens() {
+        if (game.user.isGM && canvas.scene.active && setting("focus-toggle") && MonksCommonDisplay.focusValue == "gm")
+            MonksCommonDisplay.sendFocusMessage("controlToken", { tokens: canvas.tokens.controlled.map((t) => t.id), control: true });
+    }
+
     static dataChange() {
         let data = setting('playerdata');
         let olddata = MonksCommonDisplay.playerdata;
@@ -228,94 +353,50 @@ export class MonksCommonDisplay {
             .toggleClass('hide-ui', display)
             .toggleClass('hide-chat', display && !setting('show-chat-log'))
             .toggleClass('hide-camera-views', display && !setting('show-camera-views'))
-            .toggleClass('show-combatants', setting('show-combatants'))
+            .toggleClass('show-combat', display && setting('show-combat'))
+            .toggleClass('show-combatants', display && setting('show-combatants'))
             .attr('limit-combatants', setting('limit-shown'));
         if (display && ui.sidebar)
             ui.sidebar.activateTab('chat');
-        $("body").get(0).style.setProperty("--combat-popout-scale", display ? setting('combat-scale') : 1);
-        //$('#sidebar').toggle(setting('show-chat-log') || !display);
-    }
-
-    static toggleMirrorScreen(checked) {
-        if (checked == undefined)
-            checked = !setting("mirror-movement");
-
-        /*
-        game.settings.set("monks-common-display", "mirror-movement", checked).then(() => {
-            if (checked)
-                MonksCommonDisplay.sendCanvasPan(canvas.scene._viewPosition);
-            $('#controls li[data-tool="mirror-screen"]').toggleClass('active', setting("mirror-movement"));
-        });
-        */
-    }
-
-    static toggleMirrorTokenSelection(checked) {
-        if (checked == undefined)
-            checked = !setting("mirror-token-selection");
-
-        /*
-        game.settings.set("monks-common-display", "mirror-token-selection", checked).then(() => {
-            $('#controls li[data-tool="mirror-selection"]').toggleClass('active', setting("mirror-token-selection"));
-        });
-        */
+        //$("body").get(0).style.setProperty("--combat-popout-scale", display ? setting('combat-scale') : 1);
     }
 
     static registerHotKeys() {
-        game.keybindings.register('monks-common-display', 'mirror-screen', {
-            name: 'Toggle Mirror Screen',
-            editable: [{ key: 'KeyM' }],
+        game.keybindings.register('monks-common-display', 'clear-images', {
+            name: 'Clear Images',
+            editable: [{ key: 'Comma', modifiers: ['Control'] }],
             onDown: () => {
-                MonksCommonDisplay.toggleMirrorScreen();
+                MonksCommonDisplay.emit("closeImagePopout");
             }
         });
-        game.keybindings.register('monks-common-display', 'mirror-selection', {
-            name: 'Toggle Mirror Token Selection',
-            editable: [{ key: 'KeyN' }],
+        game.keybindings.register('monks-common-display', 'clear-journals', {
+            name: 'Clear Journals',
+            editable: [{ key: 'Period', modifiers: ['Control'] }],
             onDown: () => {
-                MonksCommonDisplay.toggleMirrorTokenSelection();
+                MonksCommonDisplay.emit("closeJournals");
             }
         });
     }
 
     static initGM() {
         Hooks.on("canvasPan", (canvas, data) => {
-            if (getProperty(canvas.scene, "flags.monks-common-display.screen") == "gm") {
-                MonksCommonDisplay.sendCanvasPan(data);
+            if (MonksCommonDisplay.screenValue == "gm" && canvas.scene.active && setting("screen-toggle")) {
+                MonksCommonDisplay.sendScreenMessage("canvasPan", data);
             }
         });
-
-        /*
-        Hooks.on("controlToken", (token, control) => {
-            if (getProperty(canvas.scene, "flags.monks-common-display.screen") == "gm") {
-                MonksCommonDisplay.sendTokenSelection(token.id, control);
-            }
-        });
-        */
-
-        //I've temporarily removed this as the app-id isn't the same
-        /*
-        Hooks.on("closeImagePopout", (popout, html) => {
-            game.socket.emit(MonksCommonDisplay.SOCKET, { action: "closeImagePopout", args: [popout.appId] });
-        });*/
     }
 
-    static sendCanvasPan(data) {
-        if (canvas.scene.active &&
-            setting("screen-toggle") &&
-            MonksCommonDisplay.isAnyDisplayPlayerLoggedIn())
-        {
-            debug('pan data', data)
-            MonksCommonDisplay.emit("canvasPan", { args: data });
+    static sendScreenMessage(action, data) {
+        if (setting("screen-toggle") && MonksCommonDisplay.isAnyDisplayPlayerLoggedIn()) {
+            debug('screen message', action, data)
+            MonksCommonDisplay.emit(action, { args: data });
         }
     }
 
-    static sendTokenSelection(tokenId, control) {
-        if (canvas.scene.active &&
-            setting("focus-toggle") &&
-            MonksCommonDisplay.isAnyDisplayPlayerLoggedIn())
-        {
-            debug('selection data', tokenId, control);
-            MonksCommonDisplay.emit("controlToken", { args: { tokens: control ? [tokenId] : null, control } });
+    static sendFocusMessage(action, data) {
+        if (MonksCommonDisplay.isAnyDisplayPlayerLoggedIn()) {
+            debug('focus message', action, data);
+            MonksCommonDisplay.emit(action, { args: data }); //{ args: { tokens: control ? [tokenId] : null, control } });
         }
     }
 
@@ -370,16 +451,19 @@ export class MonksCommonDisplay {
 
     static controlToken(data) {
         if (MonksCommonDisplay.playerdata.display) {
-            MonksCommonDisplay.gmTokens = data.tokens;
-            canvas.tokens.releaseAll();
+            if (data.overwrite)
+                MonksCommonDisplay.gmControlledTokens.clear();
 
-            if (data.tokens) {
-                for (const id of data.tokens) {
-                    let token = canvas.scene.tokens.get(id);
-                    if (token) {
-                        if (token.actor.isOwner && !token.hidden) {
+            for (let id of data.tokens || []) {
+                let token = canvas.scene.tokens.get(id);
+                if (token) {
+                    if (data.control) {
+                        MonksCommonDisplay.gmControlledTokens.add(token.id);
+                        if (token.testUserPermission(game.user, "OBSERVER") && !token.hidden)
                             token._object?.control({ releaseOthers: false });
-                        }
+                    } else {
+                        MonksCommonDisplay.gmControlledTokens.delete(token.id);
+                        token._object?.release();
                     }
                 }
             }
@@ -393,35 +477,99 @@ export class MonksCommonDisplay {
             $('#combat-popout #combat-tracker').scrollTop(active.offsetTop - (setting("limit-shown") > 2 ? 50 : 0));
     }
 
-    static changeScreen() {
-        let screen = getProperty(canvas.scene, "flags.monks-common-display.screen");
-        let data;
-        if (screen == "gm") {
-            data = mergeObject({ animate: true, speed: 1000 }, game.canvas.scene._viewPosition);
+    static screenChanged() {
+        if (MonksCommonDisplay.screenValue == "gm") {
+            if (canvas.scene.active) {
+                let data = mergeObject({ animate: true, speed: 1000 }, game.canvas.scene._viewPosition);
+                MonksCommonDisplay.sendScreenMessage("canvasPan", data);
+            }
         } else {
-            let document = (screen == "combat" ? game.combats?.active?.combatant?.token : game.canvas.scene.tokens.get(screen));
-            if (document) {
-                data = {
-                    x: document.x + ((document.width * canvas.dimensions.size) / 2),
-                    y: document.y + ((document.height * canvas.dimensions.size) / 2),
-                    animate: true,
-                    speed: 1000
-                };
+            MonksCommonDisplay.sendScreenMessage("changeScreen");
+        }
+    }
+
+    static changeScreen() {
+        if (MonksCommonDisplay.playerdata.display && setting("screen-toggle")) {
+            // The screen has changed and this is a player display so refresh the screen
+            let tokens = MonksCommonDisplay.getTokens(MonksCommonDisplay.screenValue);
+            if (tokens && tokens.length) {
+                let x1, y1, x2, y2;
+                for (let token of tokens) {
+                    x1 = !x1 ? token.x : Math.min(x1, token.x);
+                    y1 = !y1 ? token.y : Math.min(y1, token.y);
+                    x2 = !x2 ? token.x + (token.width * canvas.dimensions.size) : Math.max(x2, token.x + (token.width * canvas.dimensions.size));
+                    y2 = !y2 ? token.y + (token.height * canvas.dimensions.size) : Math.max(y2, token.y + (token.height * canvas.dimensions.size));
+                }
+
+                // I want 4 squares on either side, with a minimum of 15 squares width
+                // I also need to make sure that the entire rectangle is within the screen
+                let width = Math.max((x2 - x1) + (6 * canvas.dimensions.size), (20 * canvas.dimensions.size));
+                let height = Math.max((y2 - y1) + (6 * canvas.dimensions.size), (10 * canvas.dimensions.size));
+                let scaleWidth = $('body').width() / width;
+                let scaleHeight = $('body').height() / height;
+                let panData = { x: x1 + ((x2 - x1) / 2), y: y1 + ((y2 - y1) / 2), animate: true, speed: 600, scale: Math.min(scaleWidth, scaleHeight) };
+
+                canvas.animatePan(panData);
             }
         }
-        MonksCommonDisplay.sendCanvasPan(data);
+    }
+
+    static focusChanged() {
+        if (MonksCommonDisplay.focusValue == "gm" && setting("focus-toggle") && canvas.scene.active) {
+            let tokens = game.canvas.tokens.controlled.map(t => t.id);
+            MonksCommonDisplay.sendFocusMessage("controlToken", { tokens: tokens, overwrite: true, control: true });
+        } else {
+            MonksCommonDisplay.sendFocusMessage("changeFocus");
+        }
     }
 
     static changeFocus() {
-        let focus = getProperty(canvas.scene, "flags.monks-common-display.focus");
-        let token;
-        if (focus == "gm")
-            token = game.canvas.tokens.controlled[0];
-        else if (focus == "combat")
-            token = game.combats.active?.combatant?.token;
-        else
-            token = game.canvas.scene.tokens.get(focus);
-        MonksCommonDisplay.sendTokenSelection(token?.id, true);
+        if (MonksCommonDisplay.playerdata.display) {
+            if (setting("focus-toggle")) {
+                // The screen has changed and this is a player display so refresh the screen 
+                let focus = MonksCommonDisplay.focusValue;
+                let tokens = [];
+                if (focus == "gm")
+                    tokens = MonksCommonDisplay.gmControlledTokens.filter(t => {
+                        let token = canvas.tokens.get(t);
+                        if (!token) return false;
+                        return token.testUserPermission(game.user, "OBSERVER") && !token.hidden
+                    });
+                else if (focus == "combat")
+                    tokens = [game.combats.active?.combatant?.token._object];
+                else
+                    tokens = canvas.scene.tokens.filter(t => t.id == focus || t.actor?.id == focus).map(t => t?._object);
+
+                canvas.tokens.releaseAll();
+                if (tokens.length) {
+                    for (let token of tokens)
+                        token.control({ releaseOthers: false });
+                }
+            } else {
+                canvas.tokens.releaseAll();
+            }
+        }
+    }
+
+    static get screenValue() {
+        return setting("per-scene") ? getProperty(canvas.scene, "flags.monks-common-display.screen") : setting("screen");
+    }
+
+    static get focusValue() {
+        return setting("per-scene") ? getProperty(canvas.scene, "flags.monks-common-display.focus") : setting("focus");
+    }
+
+    static getTokens(value) {
+        if (value == "combat" && game.combats.active && game.combats.active.started && game.combats.active.combatant?.token && !game.combats.active.combatant?.token.hidden)
+            return [game.combats.active.combatant?.token];
+
+        if (/^[a-zA-Z0-9]{16}$/.test(value))
+            return canvas.scene.tokens.filter(t => (t.id == value || t.actor?.id == value) && !t.hidden);
+
+        if (value == "party")
+            return canvas.scene.tokens.filter(t => t.testUserPermission(game.user, "LIMITED") && !t.hidden);
+
+        return [];
     }
 }
 
@@ -449,7 +597,7 @@ Hooks.on("updateCombat", function (combat, delta) {
             }, 500);
         }
     }
-    if (MonksCommonDisplay.toolbar) {
+    if (MonksCommonDisplay.toolbar && setting("show-toolbar") && game.user.isGM) {
         MonksCommonDisplay.toolbar.render();
     }
 });
@@ -475,7 +623,7 @@ Hooks.on("deleteCombat", function (combat) {
             }, 100);
         }
     }
-    if (MonksCommonDisplay.toolbar) {
+    if (MonksCommonDisplay.toolbar && setting("show-toolbar") && game.user.isGM) {
         MonksCommonDisplay.toolbar.render();
     }
 });
@@ -545,15 +693,6 @@ Hooks.on("getSceneControlButtons", (controls) => {
     }
 });*/
 
-Hooks.on('updateToken', (document, data, options) => {
-    if (game.user.isGM && MonksCommonDisplay.toolbar) {
-        let tkn = MonksCommonDisplay.toolbar.tokens.find(t => t.token.id == document.id);
-        if (tkn) {
-            this.updateToken(tkn, options.ignoreRefresh !== true);
-        }
-    }
-});
-
 Hooks.on('renderPlayerList', async (playerList, html, data) => {
     let playerdata = setting('playerdata');
 
@@ -575,7 +714,7 @@ Hooks.on('renderSceneControls', (control, html, data) => {
         const title = "Toggle Common Display Bar";
         const icon = 'fas fa-chalkboard-teacher';
         const active = setting('show-toolbar');
-        const btn = $(`<li class="common-display toggle ${active ? 'active' : ''}" title="${title}" data-tool="${name}"><i class="${icon}"></i></li>`);
+        const btn = $(`<li class="common-display toggle ${game.modules.get("minimal-ui")?.active ? "minimal " : ""}${active ? 'active' : ''}" title="${title}" data-tool="${name}"><i class="${icon}"></i></li>`);
         btn.on('click', () => {
             let toggled = !setting("show-toolbar");
             game.settings.set('monks-common-display', 'show-toolbar', toggled);
@@ -596,25 +735,32 @@ Hooks.on('renderSceneControls', (control, html, data) => {
 
 Hooks.on("controlToken", async (token, control) => {
     if (control && !!MonksCommonDisplay.selectToken) {
-        await canvas.scene.setFlag("monks-common-display", MonksCommonDisplay.selectToken, token.id);
-        setProperty(canvas.scene, `flags.monks-common-display.${MonksCommonDisplay.selectToken}`, token.id);
-        if (MonksCommonDisplay.selectToken == "screen") MonksCommonDisplay.changeScreen(); else MonksCommonDisplay.changeFocus();
+        if (setting("per-scene")) {
+            await canvas.scene.setFlag("monks-common-display", MonksCommonDisplay.selectToken, token.id);
+            setProperty(canvas.scene, `flags.monks-common-display.${MonksCommonDisplay.selectToken}`, token.id);
+        } else {
+            await game.settings.set("monks-common-display", MonksCommonDisplay.selectToken, token.id);
+        }
+        if (MonksCommonDisplay.selectToken == "screen") MonksCommonDisplay.screenChanged(); else MonksCommonDisplay.focusChanged();
+
         MonksCommonDisplay.selectToken = null;
-        if (MonksCommonDisplay.toolbar)
+
+        if (MonksCommonDisplay.toolbar && setting("show-toolbar") && game.user.isGM)
             MonksCommonDisplay.toolbar.render(true);
     }
 
-    if (getProperty(canvas.scene, "flags.monks-common-display.focus") == "gm") {
-        MonksCommonDisplay.sendTokenSelection(token.id, control);
+    let focus = MonksCommonDisplay.focusValue;
+
+    if (focus == "gm" && game.user.isGM && setting("focus-toggle")) {
+        MonksCommonDisplay.sendFocusMessage("controlToken", { tokens: [token.id], control });
     }
 
     let display = MonksCommonDisplay.playerdata.display || false;
     if (display && setting("focus-toggle")) {
         // double-check that this is the token that should be focussed
-        let focus = getProperty(canvas.scene, "flags.monks-common-display.focus");
-        let shouldControl = (focus == "gm" && MonksCommonDisplay.gmTokens.contains(token.id)) ||
+        let shouldControl = (focus == "gm" && MonksCommonDisplay.gmControlledTokens.has(token.id)) ||
             (focus == "combat" && game.combats.active && game.combats.active.combatant?.token.id == token.id) || 
-            (focus == token.id);
+            (focus == token.id || focus == token.actor?.id);
         if (control != shouldControl) {
             if (shouldControl)
                 token.control({ releaseOthers: false });
@@ -625,31 +771,30 @@ Hooks.on("controlToken", async (token, control) => {
 });
 
 Hooks.on("updateToken", async function (document, data, options, userid) {
+    /*
+    if (game.user.isGM && MonksCommonDisplay.toolbar) {
+        let tkn = MonksCommonDisplay.toolbar.tokens.find(t => t.token.id == document.id);
+        if (tkn) {
+            this.updateToken(tkn, options.ignoreRefresh !== true);
+        }
+    }*/
+
     //+++ only if this is a selected token and the texture src is changing
-    if (MonksCommonDisplay.toolbar)
+    if (MonksCommonDisplay.toolbar && setting("show-toolbar") && game.user.isGM)
         MonksCommonDisplay.toolbar.render(true);
 
-    if ((data.x != undefined || data.y != undefined) &&
-        game.user.isGM &&
-        setting("screen-toggle") && 
-        (getProperty(canvas.scene, "flags.monks-common-display.screen") == document.id ||
-        (getProperty(canvas.scene, "flags.monks-common-display.screen") == "combat" &&
-        game.combats.active &&
-        game.combats.active.combatant?.token.id == document.id &&
-        !document.hidden
-        )))
-    {
-        MonksCommonDisplay.sendCanvasPan({
-            x: document.x + ((document.width * canvas.dimensions.size) / 2),
-            y: document.y + ((document.height * canvas.dimensions.size) / 2),
-            animate: true,
-            speed: 600
-        });
+    let display = MonksCommonDisplay.playerdata.display || false;
+    if (display &&
+        (data.x != undefined || data.y != undefined) &&
+        setting("screen-toggle") &&
+        !document.hidden) {
+
+        MonksCommonDisplay.changeScreen();
     }
 });
 
 Hooks.on("deleteToken", () => {
-    if (MonksCommonDisplay.toolbar)
+    if (MonksCommonDisplay.toolbar && setting("show-toolbar") && game.user.isGM)
         MonksCommonDisplay.toolbar.render(true);
 });
 
@@ -661,17 +806,12 @@ Hooks.on("updateCombat", async function (combat, delta) {
         combat.combatant?.token &&
         !combat.combatant.token.hidden)
     {
-        if (setting("screen-toggle") && getProperty(canvas.scene, "flags.monks-common-display.screen") == "combat") {
-            canvas.animatePan({
-                x: combat.combatant.token.x + ((combat.combatant.token.width * canvas.dimensions.size) / 2),
-                y: combat.combatant.token.y + ((combat.combatant.token.height * canvas.dimensions.size) / 2),
-                animate: true,
-                speed: 600
-            });
+        if (setting("screen-toggle") && MonksCommonDisplay.screenValue == "combat") {
+            MonksCommonDisplay.changeScreen();
         }
 
         if (setting("focus-toggle") &&
-            getProperty(canvas.scene, "flags.monks-common-display.focus") == "combat" &&
+            MonksCommonDisplay.focusValue == "combat" &&
             combat.combatant?.token.isOwner)
         {
             combat.combatant?.token?._object?.control({ releaseOthers: true });

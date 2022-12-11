@@ -1,3 +1,31 @@
+# Version 10.2
+
+Fixed an issue where the toolbar wouldn't stay minimised
+
+Added the option to have the settings per scene or one setting overall.
+
+Added the option to select an actor to focus on, rather than just a token.  So you can switch scenes and it will still follow the appropriate token.
+
+Added the option to set the screen size pased on the party.  So it will maintain a viewport that all tokens the display player has limited or greater access to will show.
+
+Fixed issue with initial positioning.
+
+Added the option to click on the screen or vision headers to select what type of view.  Instead of having to right click to get the menu up.
+
+Fixed an issue with the toolbar wandering slightly to the right.
+
+Fixed issue with combat tracker never disappearing when requested to not be shown.
+
+Fixed issue with the size of the toolbat in Call of Cthulu
+
+Fixed issue with common display button in the minimal ui interface
+
+Removed the error message that a token doesn't have vision on a scene.
+
+Fixed issue with auto closing an image popout when opened from the Image Popout instead of a Journal.
+
+Added key bindings for closing journals or closing images.
+
 # Version 10.1
 
 Totally updated the interface.  

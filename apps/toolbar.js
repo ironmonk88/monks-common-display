@@ -9,11 +9,13 @@ export class CommonToolbar extends Application {
         this._collapsed = false;
 
         Hooks.on('canvasReady', () => {
-            this.render(true);
+            if (setting("show-toolbar"))
+                this.render(true);
         });
 
         Hooks.on("updateCombat", () => {
-            this.render(true);
+            if (setting("show-toolbar"))
+                this.render(true);
         });
     }
 
@@ -43,21 +45,22 @@ export class CommonToolbar extends Application {
         else
             collapseIcon = this._collapsed ? "fa-caret-right" : "fa-caret-left";
 
-        let flags = getProperty(canvas.scene, "flags.monks-common-display") || {};
+        let screen = (setting("per-scene") ? getProperty(canvas.scene, "flags.monks-common-display.screen") : setting("screen")) || "gm";
+        let focus = (setting("per-scene") ? getProperty(canvas.scene, "flags.monks-common-display.focus") : setting("focus")) || "gm";
 
         return mergeObject(super.getData(options), {
             tokens: this.tokens,
             cssClass: css,
             screen: {
-                icon: this.getIcon(flags.screen || "gm", "screen"),
-                img: this.getImage(flags.screen || "gm", "screen"),
-                tooltip: this.getTooltip(flags.screen || "gm", "screen"),
+                icon: this.getIcon(screen, "screen"),
+                img: this.getImage(screen, "screen"),
+                tooltip: this.getTooltip(screen, "screen"),
                 active: setting("screen-toggle")
             },
             focus: {
-                icon: this.getIcon(flags.focus || "gm", "focus"),
-                img: this.getImage(flags.focus || "gm", "focus"),
-                tooltip: this.getTooltip(flags.focus || "gm", "focus"),
+                icon: this.getIcon(focus, "focus"),
+                img: this.getImage(focus, "focus"),
+                tooltip: this.getTooltip(focus, "focus"),
                 active: setting("focus-toggle")
             },
             //inCombat: game.combats.active?.started,
@@ -73,11 +76,13 @@ export class CommonToolbar extends Application {
         if (MonksCommonDisplay.selectToken == type)
             return "fa-bullseye";
 
-        if (id == "combat" && game.combats.active)
+        if (id == "combat") // && game.combats.active)
             return "fa-swords";
-        else if(id == "gm"){
+        else if(id == "gm")
             return "fa-people-arrows";
-        }
+        else if (id == "party")
+            return "fa-users-viewfinder";
+
         return "fa-people-arrows";
     }
 
@@ -87,7 +92,7 @@ export class CommonToolbar extends Application {
 
         if (id != "combat" && id != "gm") {
             //try and find the image of the token
-            let token = canvas.scene.tokens.get(id);
+            let token = canvas.scene.tokens.find(t => t.id == id || t.actor?.id == id);
             if (token)
                 return token.texture.src;
         }
@@ -104,7 +109,7 @@ export class CommonToolbar extends Application {
         if (this.pos == undefined) {
             this.pos = {
                 top: 60,
-                left: (($('#board').width / 2) - 150)
+                left: 120
             };
             game.user.setFlag("monks-common-display", "position", this.pos);
         }
@@ -148,17 +153,26 @@ export class CommonToolbar extends Application {
             let active = !setting("screen-toggle");
             await game.settings.set("monks-common-display", "screen-toggle", active);
             if (active) {
-                MonksCommonDisplay.changeScreen();
+                MonksCommonDisplay.screenChanged();
             }
             this.render();
         });
         $('.common-display-button.focus', html).on("click", async (event) => {
             let active = !setting("focus-toggle");
             await game.settings.set("monks-common-display", "focus-toggle", active);
-            if (active) {
-                MonksCommonDisplay.changeFocus();
-            }
+            MonksCommonDisplay.focusChanged();
             this.render();
+        });
+
+        $('.header.screen', html).on("click", async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            $(event.currentTarget).closest(".common-button-group").contextmenu();
+        });
+        $('.header.focus', html).on("click", async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            $(event.currentTarget).closest(".common-button-group").contextmenu();
         });
 
         this._contextMenu(html);
@@ -230,7 +244,7 @@ export class CommonToolbar extends Application {
                         //if (xPos > (window.innerWidth / 2))
                         //    position.right = (window.innerWidth - xPos);
                         //else
-                        position.left = xPos + 1;
+                        position.left = xPos; // + 1;
 
                         elmnt.style.bottom = (position.bottom ? position.bottom + "px" : null);
                         elmnt.style.right = (position.right ? position.right + "px" : null);
@@ -262,8 +276,11 @@ export class CommonToolbar extends Application {
                 condition: game.user.isGM,
                 callback: async (btn) => {
                     MonksCommonDisplay.selectToken = null;
-                    await canvas.scene.setFlag("monks-common-display", btn.data("action"), "gm");
-                    if (btn.data("action") == "screen") MonksCommonDisplay.changeScreen(); else MonksCommonDisplay.changeFocus();
+                    if (setting("per-scene"))
+                        await canvas.scene.setFlag("monks-common-display", btn.data("action"), "gm");
+                    else
+                        await game.settings.set("monks-common-display", btn.data("action"), "gm");
+                    if (btn.data("action") == "screen") MonksCommonDisplay.screenChanged(); else MonksCommonDisplay.focusChanged();
                     this.render(true);
                 }
             },
@@ -273,8 +290,27 @@ export class CommonToolbar extends Application {
                 condition: game.user.isGM,
                 callback: async (btn) => {
                     MonksCommonDisplay.selectToken = null;
-                    await canvas.scene.setFlag("monks-common-display", btn.data("action"), "combat");
-                    if (btn.data("action") == "screen") MonksCommonDisplay.changeScreen(); else MonksCommonDisplay.changeFocus();
+                    if (setting("per-scene"))
+                        await canvas.scene.setFlag("monks-common-display", btn.data("action"), "combat");
+                    else
+                        await game.settings.set("monks-common-display", btn.data("action"), "combat");
+                    if (btn.data("action") == "screen") MonksCommonDisplay.screenChanged(); else MonksCommonDisplay.focusChanged();
+                    this.render(true);
+                }
+            },
+            {
+                name: "Party",
+                icon: '<i class="fas fa-users-viewfinder"></i>',
+                condition: (btn) => {
+                    return game.user.isGM && btn.data("action") == "screen";
+                },
+                callback: async (btn) => {
+                    MonksCommonDisplay.selectToken = null;
+                    if (setting("per-scene"))
+                        await canvas.scene.setFlag("monks-common-display", btn.data("action"), "party");
+                    else
+                        await game.settings.set("monks-common-display", btn.data("action"), "party");
+                    if (btn.data("action") == "screen") MonksCommonDisplay.screenChanged(); else MonksCommonDisplay.focusChanged();
                     this.render(true);
                 }
             },
@@ -284,7 +320,6 @@ export class CommonToolbar extends Application {
                 condition: game.user.isGM,
                 callback: btn => {
                     MonksCommonDisplay.selectToken = (!!MonksCommonDisplay.selectToken ? null : btn.data("action"));
-                    if (btn.data("action") == "screen") MonksCommonDisplay.changeScreen(); else MonksCommonDisplay.changeFocus();
                     this.render(true);
                 }
             }
