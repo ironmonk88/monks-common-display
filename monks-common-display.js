@@ -20,6 +20,17 @@ export let combatposition = () => {
     return game.settings.get("monks-common-display", "combat-position");
 };
 
+export let patchFunc = (prop, func, type = "WRAPPER") => {
+    if (game.modules.get("lib-wrapper")?.active) {
+        libWrapper.register("monks-common-display", prop, func, type);
+    } else {
+        const oldFunc = eval(prop);
+        eval(`${prop} = function (event) {
+            return func.call(this, oldFunc.bind(this), ...arguments);
+        }`);
+    }
+}
+
 function registerLayer() {
     /*
     CONFIG.Canvas.layers.monkscommondisplay = { group: "interface", layerClass: MonksCommonDisplayLayer };
@@ -53,7 +64,7 @@ export class MonksCommonDisplay {
         MonksCommonDisplay.registerHotKeys();
 
         if (game.modules.get("lib-wrapper")?.active) {
-            libWrapper.ignore_conflicts("monks-common-display", "monks-active-tiles", "ActorDirectory.prototype._onClickDocumentName");
+            libWrapper.ignore_conflicts("monks-common-display", "monks-active-tiles", "ActorDirectory.prototype._onClickEntryName");
         }
 
         //this is so the screen starts up with the correct information, it'll be altered once the players are actually loaded
@@ -155,7 +166,7 @@ export class MonksCommonDisplay {
             }
         }
 
-        let clickDocumentName = async function (wrapped, ...args) {
+        let clickEntryName = async function (wrapped, ...args) {
             let event = args[0];
             if (!!MonksCommonDisplay.selectToken) {
                 event.preventDefault();
@@ -176,14 +187,7 @@ export class MonksCommonDisplay {
                 wrapped(...args);
         }
 
-        if (game.modules.get("lib-wrapper")?.active) {
-            libWrapper.register("monks-common-display", "ActorDirectory.prototype._onClickDocumentName", clickDocumentName, "MIXED");
-        } else {
-            const oldClickActorName = ActorDirectory.prototype._onClickDocumentName;
-            ActorDirectory.prototype._onClickDocumentName = function (event) {
-                return clickDocumentName.call(this, oldClickActorName.bind(this), ...arguments);
-            }
-        }
+        patchFunc("ActorDirectory.prototype._onClickEntryName", clickEntryName, "MIXED");
 
         /*
         let showEntry = async function (...args) {

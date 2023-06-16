@@ -1,3 +1,7 @@
+# Version 11.01
+
+Adding support for v11
+
 # Version 10.2
 
 Fixed an issue where the toolbar wouldn't stay minimised
