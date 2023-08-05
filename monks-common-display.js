@@ -225,7 +225,7 @@ export class MonksCommonDisplay {
             let menu = wrapped(...args);
 
             menu.push({
-                name: "Show as Common Display",
+                name: i18n("MonksCommonDisplay.ShowAsCommonDisplay"),
                 icon: '<i class="fas fa-presentation-screen"></i>',
                 condition: li => game.user.isGM && !game.users.get(li[0].dataset.userId).isGM,
                 callback: li => {
@@ -263,6 +263,8 @@ export class MonksCommonDisplay {
                 if (setting("screen-toggle")) {
                     if (MonksCommonDisplay.screenValue == "gm")
                         MonksCommonDisplay.emit("requestScreenPosition");
+                    else if (MonksCommonDisplay.screenValue == "scene")
+                        MonksCommonDisplay.sceneView();
                     else
                         MonksCommonDisplay.changeScreen();
                 }
@@ -352,7 +354,7 @@ export class MonksCommonDisplay {
     }
 
     static toggleCommonDisplay() {
-        let display = MonksCommonDisplay.playerdata.display || false;
+        let display = (MonksCommonDisplay.playerdata.display || false) && setting("hide-ui");
         $('body')
             .toggleClass('hide-ui', display)
             .toggleClass('hide-chat', display && !setting('show-chat-log'))
@@ -367,14 +369,14 @@ export class MonksCommonDisplay {
 
     static registerHotKeys() {
         game.keybindings.register('monks-common-display', 'clear-images', {
-            name: 'Clear Images',
+            name: 'MonksCommonDisplay.ClearImages',
             editable: [{ key: 'Comma', modifiers: ['Control'] }],
             onDown: () => {
                 MonksCommonDisplay.emit("closeImagePopout");
             }
         });
         game.keybindings.register('monks-common-display', 'clear-journals', {
-            name: 'Clear Journals',
+            name: 'MonksCommonDisplay.ClearJournals',
             editable: [{ key: 'Period', modifiers: ['Control'] }],
             onDown: () => {
                 MonksCommonDisplay.emit("closeJournals");
@@ -487,6 +489,8 @@ export class MonksCommonDisplay {
                 let data = mergeObject({ animate: true, speed: 1000 }, game.canvas.scene._viewPosition);
                 MonksCommonDisplay.sendScreenMessage("canvasPan", data);
             }
+        } else if (MonksCommonDisplay.screenValue == "scene") {
+            MonksCommonDisplay.sendScreenMessage("sceneView");
         } else {
             MonksCommonDisplay.sendScreenMessage("changeScreen");
         }
@@ -505,16 +509,31 @@ export class MonksCommonDisplay {
                     y2 = !y2 ? token.y + (token.height * canvas.dimensions.size) : Math.max(y2, token.y + (token.height * canvas.dimensions.size));
                 }
 
+                if (setting("show-chat-log"))
+                    x2 += ($("#sidebar").width() / 2);
+
                 // I want 4 squares on either side, with a minimum of 15 squares width
                 // I also need to make sure that the entire rectangle is within the screen
-                let width = Math.max((x2 - x1) + (6 * canvas.dimensions.size), (20 * canvas.dimensions.size));
-                let height = Math.max((y2 - y1) + (6 * canvas.dimensions.size), (10 * canvas.dimensions.size));
-                let scaleWidth = $('body').width() / width;
+                let screenWidth = $('body').width() - (setting("show-chat-log") ? $("#sidebar").width() : 0);
+                let ratio = screenWidth / $('body').height();
+                let width = Math.max((x2 - x1) + (6 * canvas.dimensions.size), (setting("focus-padding") * ratio * canvas.dimensions.size));
+                let height = Math.max((y2 - y1) + (6 * canvas.dimensions.size), (setting("focus-padding") * canvas.dimensions.size));
+                let scaleWidth = screenWidth / width;
                 let scaleHeight = $('body').height() / height;
-                let panData = { x: x1 + ((x2 - x1) / 2), y: y1 + ((y2 - y1) / 2), animate: true, speed: 600, scale: Math.min(scaleWidth, scaleHeight) };
+                let panData = { x: x1 + ((x2 - x1) / 2), y: y1 + ((y2 - y1) / 2), animate: true, speed: 200, scale: Math.min(scaleWidth, scaleHeight) };
 
                 canvas.animatePan(panData);
             }
+        }
+    }
+
+    static sceneView() {
+        if (MonksCommonDisplay.playerdata.display && setting("screen-toggle")) {
+            let screenWidth = $('body').width() - (setting("show-chat-log") ? $("#sidebar").width() : 0);
+            let scaleWidth = screenWidth / canvas.scene.dimensions.sceneWidth;
+            let scaleHeight = $('body').height() / canvas.scene.dimensions.sceneHeight;
+            let panData = { x: (canvas.scene.dimensions.width / 2) + (setting("show-chat-log") ? $("#sidebar").width() : 0), y: canvas.scene.dimensions.height / 2, animate: true, speed: 200, scale: Math.min(scaleWidth, scaleHeight) };
+            canvas.animatePan(panData);
         }
     }
 
@@ -563,17 +582,19 @@ export class MonksCommonDisplay {
         return setting("per-scene") ? getProperty(canvas.scene, "flags.monks-common-display.focus") : setting("focus");
     }
 
+    static isDefeated(token) {
+        return (token && (token.combatant && token.combatant.defeated) || token.actor?.statuses.has(CONFIG.specialStatusEffects.DEFEATED) || token.overlayEffect == CONFIG.controlIcons.defeated);
+    }
+
     static getTokens(value) {
         if (value == "combat" && game.combats.active && game.combats.active.started && game.combats.active.combatant?.token && !game.combats.active.combatant?.token.hidden)
             return [game.combats.active.combatant?.token];
 
-        if (/^[a-zA-Z0-9]{16}$/.test(value))
-            return canvas.scene.tokens.filter(t => (t.id == value || t.actor?.id == value) && !t.hidden);
-
         if (value == "party")
-            return canvas.scene.tokens.filter(t => t.testUserPermission(game.user, "LIMITED") && !t.hidden);
+            return canvas.scene.tokens.filter(t => t.testUserPermission(game.user, "LIMITED") && !t.hidden && !MonksCommonDisplay.isDefeated(t));
 
-        return [];
+        let ids = value.split(",").filter(i => /^[a-zA-Z0-9]{16}$/.test(i));
+        return canvas.scene.tokens.filter(t => (ids.includes(t.id) || t.actor?.id == value) && !t.hidden);
     }
 }
 
@@ -738,6 +759,7 @@ Hooks.on('renderSceneControls', (control, html, data) => {
 });
 
 Hooks.on("controlToken", async (token, control) => {
+    /*
     if (control && !!MonksCommonDisplay.selectToken) {
         if (setting("per-scene")) {
             await canvas.scene.setFlag("monks-common-display", MonksCommonDisplay.selectToken, token.id);
@@ -751,7 +773,7 @@ Hooks.on("controlToken", async (token, control) => {
 
         if (MonksCommonDisplay.toolbar && setting("show-toolbar") && game.user.isGM)
             MonksCommonDisplay.toolbar.render(true);
-    }
+    }*/
 
     let focus = MonksCommonDisplay.focusValue;
 

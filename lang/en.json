@@ -24,6 +24,8 @@
   "MonksCommonDisplay.close-after.hint": "Automatically close any windows that are popped out after (seconds)",
   "MonksCommonDisplay.per-scene.name": "Setting per scene",
   "MonksCommonDisplay.per-scene.hint": "Store the settings per scene so each scene can have different display",
+  "MonksCommonDisplay.hide-ui.name": "Hide UI",
+  "MonksCommonDisplay.hide-ui.hint": "Hide the UI for the common display",
 
   "MonksCommonDisplay.change-settings": "Change Settings",
   "MonksCommonDisplay.mirror-screen": "Mirror Screen",
@@ -31,6 +33,14 @@
   "MonksCommonDisplay.clear-images": "Clear Images",
   "MonksCommonDisplay.clear-journals": "Clear Journal Entries",
   "MonksCommonDisplay.toggletoolbar": "Toggle Toolbar",
+  "MonksCommonDisplay.GM": "GM",
+  "MonksCommonDisplay.FullScene": "Full Scene",
+  "MonksCommonDisplay.Combatant": "Combatant",
+  "MonksCommonDisplay.Party": "Party",
+  "MonksCommonDisplay.SelectTokens": "Select Tokens",
+  "MonksCommonDisplay.ShowAsCommonDisplay": "Show as Common Display",
+  "MonksCommonDisplay.ClearImages": "Clear Images",
+  "MonksCommonDisplay.ClearJournals": "Clear Journals",
 
   "MonksCommonDisplay.players": "Players",
   "MonksCommonDisplay.display.name": "Display",

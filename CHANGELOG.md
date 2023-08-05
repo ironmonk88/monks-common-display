@@ -1,3 +1,23 @@
+# Version 11.02
+
+Fixed issue where a blank setting wasn't defaulting the icon properly.
+
+Added the option to set the screen to be the entire scene, in case you have a splash screen.
+
+Changed the select token button to allow you to select multiple tokens, before pressing the button to select them.
+
+Allowed the combat carosel to be shown.
+
+Fixed issue where the context menu was being hidden behind other windows.
+
+Added the option to toggle hiding ui elements on or off.  So you have have control of the other display, while still showing all the tools.
+
+Added the option to set how much padding you want around your party.
+
+Added the option to exclude the chat bar from calculating positioning.  So tokens won't get hidden under the chat log if you want to keep that visible.
+
+Fixed issue where defeated tokens were still being tracked for positioning.
+
 # Version 11.01
 
 Adding support for v11

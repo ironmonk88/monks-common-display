@@ -5,8 +5,6 @@ export const registerSettings = function () {
     // Register any custom module settings here
 	let modulename = "monks-common-display";
 
-	const debouncedReload = foundry.utils.debounce(function () { window.location.reload(); }, 500);
-
 	game.settings.registerMenu(modulename, 'configure', {
 		name: 'Configure Common Display',
 		label: 'Configure Common Display',
@@ -35,6 +33,18 @@ export const registerSettings = function () {
 		}
 	});
 
+	game.settings.register(modulename, "hide-ui", {
+		name: i18n("MonksCommonDisplay.hide-ui.name"),
+		hint: i18n("MonksCommonDisplay.hide-ui.hint"),
+		scope: "world",
+		config: true,
+		default: true,
+		type: Boolean,
+		onChange: () => {
+			MonksCommonDisplay.toggleCommonDisplay();
+		}
+	});
+
 	game.settings.register(modulename, "allow-gm-players", {
 		name: i18n("MonksCommonDisplay.allow-gm-players.name"),
 		hint: i18n("MonksCommonDisplay.allow-gm-players.hint"),
@@ -42,6 +52,20 @@ export const registerSettings = function () {
 		config: true,
 		default: false,
 		type: Boolean
+	});
+
+	game.settings.register(modulename, "focus-padding", {
+		name: game.i18n.localize("MonksTokenBar.focus-padding.name"),
+		hint: game.i18n.localize("MonksTokenBar.focus-padding.hint"),
+		scope: "world",
+		config: true,
+		range: {
+			min: 5,
+			max: 30,
+			step: 1,
+		},
+		default: 10,
+		type: Number
 	});
 
 	game.settings.register(modulename, "show-chat-log", {
@@ -146,7 +170,7 @@ export const registerSettings = function () {
 		config: false,
 		default: false,
 		type: Boolean,
-		onChange: debouncedReload
+		requiresReload: true
 	});
 
 	game.settings.register(modulename, "startupdata", {

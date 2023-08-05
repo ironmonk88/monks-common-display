@@ -78,12 +78,14 @@ export class CommonToolbar extends Application {
 
         if (id == "combat") // && game.combats.active)
             return "fa-swords";
-        else if(id == "gm")
+        else if (id == "gm" || !id)
             return "fa-people-arrows";
         else if (id == "party")
             return "fa-users-viewfinder";
+        else if (id == "scene")
+            return "fa-presentation-screen";
 
-        return "fa-people-arrows";
+        return "fa-users";
     }
 
     getImage(id, type) {
@@ -92,6 +94,9 @@ export class CommonToolbar extends Application {
 
         if (id != "combat" && id != "gm") {
             //try and find the image of the token
+            if (id.indexOf(",") > -1)
+                return null;
+
             let token = canvas.scene.tokens.find(t => t.id == id || t.actor?.id == id);
             if (token)
                 return token.texture.src;
@@ -150,10 +155,23 @@ export class CommonToolbar extends Application {
         $('.common-display-button[data-action="clear-image"]', html).on("click", () => { MonksCommonDisplay.emit("closeImagePopout"); });
 
         $('.common-display-button.screen', html).on("click", async (event) => {
-            let active = !setting("screen-toggle");
-            await game.settings.set("monks-common-display", "screen-toggle", active);
-            if (active) {
-                MonksCommonDisplay.screenChanged();
+            if (!!MonksCommonDisplay.selectToken) {
+                let tokenids = canvas.tokens.controlled.map((t) => t.id).join(",");
+                if (setting("per-scene")) {
+                    await canvas.scene.setFlag("monks-common-display", MonksCommonDisplay.selectToken, tokenids);
+                    setProperty(canvas.scene, `flags.monks-common-display.${MonksCommonDisplay.selectToken}`, tokenids);
+                } else {
+                    await game.settings.set("monks-common-display", MonksCommonDisplay.selectToken, tokenids);
+                }
+                if (MonksCommonDisplay.selectToken == "screen") MonksCommonDisplay.screenChanged(); else MonksCommonDisplay.focusChanged();
+
+                MonksCommonDisplay.selectToken = null;
+            } else {
+                let active = !setting("screen-toggle");
+                await game.settings.set("monks-common-display", "screen-toggle", active);
+                if (active) {
+                    MonksCommonDisplay.screenChanged();
+                }
             }
             this.render();
         });
@@ -271,7 +289,7 @@ export class CommonToolbar extends Application {
     _getContextOptions() {
         return [
             {
-                name: "GM",
+                name: i18n("MonksCommonDisplay.GM"),
                 icon: '<i class="fas fa-user"></i>',
                 condition: game.user.isGM,
                 callback: async (btn) => {
@@ -285,8 +303,24 @@ export class CommonToolbar extends Application {
                 }
             },
             {
-                name: "Combatant",
-                icon: '<i class="fas fa-hand-fist"></i>',
+                name: i18n("MonksCommonDisplay.FullScene"),
+                icon: '<i class="fas fa-presentation-screen"></i>',
+                condition: (btn) => {
+                    return game.user.isGM && btn.data("action") == "screen";
+                },
+                callback: async (btn) => {
+                    MonksCommonDisplay.selectToken = null;
+                    if (setting("per-scene"))
+                        await canvas.scene.setFlag("monks-common-display", btn.data("action"), "scene");
+                    else
+                        await game.settings.set("monks-common-display", btn.data("action"), "scene");
+                    if (btn.data("action") == "screen") MonksCommonDisplay.screenChanged(); else MonksCommonDisplay.focusChanged();
+                    this.render(true);
+                }
+            },
+            {
+                name: i18n("MonksCommonDisplay.Combatant"),
+                icon: '<i class="fas fa-swords"></i>',
                 condition: game.user.isGM,
                 callback: async (btn) => {
                     MonksCommonDisplay.selectToken = null;
@@ -299,7 +333,7 @@ export class CommonToolbar extends Application {
                 }
             },
             {
-                name: "Party",
+                name: i18n("MonksCommonDisplay.Party"),
                 icon: '<i class="fas fa-users-viewfinder"></i>',
                 condition: (btn) => {
                     return game.user.isGM && btn.data("action") == "screen";
@@ -315,7 +349,7 @@ export class CommonToolbar extends Application {
                 }
             },
             {
-                name: "Select a Token",
+                name: i18n("MonksCommonDisplay.SelectTokens"),
                 icon: '<i class="fas fa-bullseye"></i>',
                 condition: game.user.isGM,
                 callback: btn => {
