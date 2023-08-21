@@ -309,9 +309,15 @@ export class MonksCommonDisplay {
 
         if (!game.modules.get('monks-combat-details')?.active && !game.modules.get('monks-enhanced-journal')?.active) {
             patchFunc("Draggable.prototype._onDragMouseUp", async function (wrapped, ...args) {
-                for (const cls of this.app.constructor._getInheritanceChain()) {
-                    Hooks.callAll(`dragEnd${cls.name}`, this.app, this.app.position);
-                }
+                try {
+                    if (this.app.constructor._getInheritanceChain) {
+                        for (const cls of this.app.constructor._getInheritanceChain()) {
+                            Hooks.callAll(`dragEnd${cls.name}`, this.app, this.app.position);
+                        }
+                    } else {
+                        Hooks.callAll(`dragEnd${this.app.constructor.name}`, this.app, this.app.position);
+                    }
+                } catch (e) { }
                 return wrapped(...args);
             });
         }
