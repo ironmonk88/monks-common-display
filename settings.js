@@ -55,8 +55,8 @@ export const registerSettings = function () {
 	});
 
 	game.settings.register(modulename, "focus-padding", {
-		name: game.i18n.localize("MonksTokenBar.focus-padding.name"),
-		hint: game.i18n.localize("MonksTokenBar.focus-padding.hint"),
+		name: i18n("MonksCommonDisplay.focus-padding.name"),
+		hint: i18n("MonksCommonDisplay.focus-padding.hint"),
 		scope: "world",
 		config: true,
 		range: {
@@ -164,8 +164,8 @@ export const registerSettings = function () {
 	});
 
 	game.settings.register(modulename, "show-vertical", {
-		name: game.i18n.localize("MonksTokenBar.show-vertical.name"),
-		hint: game.i18n.localize("MonksTokenBar.show-vertical.hint"),
+		name: i18n("MonksCommonDisplay.show-vertical.name"),
+		hint: i18n("MonksCommonDisplay.show-vertical.hint"),
 		scope: "world",
 		config: false,
 		default: false,

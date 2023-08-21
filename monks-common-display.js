@@ -16,9 +16,6 @@ export let i18n = key => {
 export let setting = key => {
     return game.settings.get("monks-common-display", key);
 };
-export let combatposition = () => {
-    return game.settings.get("monks-common-display", "combat-position");
-};
 
 export let patchFunc = (prop, func, type = "WRAPPER") => {
     if (game.modules.get("lib-wrapper")?.active) {
@@ -310,10 +307,13 @@ export class MonksCommonDisplay {
         if (setting("show-toolbar") && game.user.isGM)
             MonksCommonDisplay.toolbar = new CommonToolbar().render(true);
 
-        let oldDragMouseUp = Draggable.prototype._onDragMouseUp;
-        Draggable.prototype._onDragMouseUp = function (event) {
-            Hooks.call(`dragEnd${this.app.constructor.name}`, this.app);
-            return oldDragMouseUp.call(this, event);
+        if (!game.modules.get('monks-combat-details')?.active && !game.modules.get('monks-enhanced-journal')?.active) {
+            patchFunc("Draggable.prototype._onDragMouseUp", async function (wrapped, ...args) {
+                for (const cls of this.app.constructor._getInheritanceChain()) {
+                    Hooks.callAll(`dragEnd${cls.name}`, this.app, this.app.position);
+                }
+                return wrapped(...args);
+            });
         }
     }
 
@@ -587,8 +587,10 @@ export class MonksCommonDisplay {
     }
 
     static getTokens(value) {
-        if (value == "combat" && game.combats.active && game.combats.active.started && game.combats.active.combatant?.token && !game.combats.active.combatant?.token.hidden)
-            return [game.combats.active.combatant?.token];
+        if (value == "combat" && game.combats.active && game.combats.active.started && game.combats.active.combatant?.token && !game.combats.active.combatant?.token.hidden) {
+            let targets = Array.from(game.user.targets).map(t => t.document);
+            return [game.combats.active.combatant?.token, ...targets];
+        }
 
         if (value == "party")
             return canvas.scene.tokens.filter(t => t.testUserPermission(game.user, "LIMITED") && !t.hidden && !MonksCommonDisplay.isDefeated(t));
@@ -842,5 +844,16 @@ Hooks.on("updateCombat", async function (combat, delta) {
         {
             combat.combatant?.token?._object?.control({ releaseOthers: true });
         }
+    }
+});
+
+Hooks.on("targetToken", async function (user, token, targeted) {
+    if (game.combats.viewed.started &&
+        game.combats.viewed.active &&
+        MonksCommonDisplay.screenValue == "combat")
+    {
+        window.setTimeout(() => {
+            MonksCommonDisplay.changeScreen();
+        }, 100);
     }
 });

@@ -1,3 +1,9 @@
+# Version 11.03
+
+Updated combat view to alter the view field to include targeted tokens.
+
+Cleaned up warning associated with changes made to Combat Details.
+
 # Version 11.02
 
 Fixed issue where a blank setting wasn't defaulting the icon properly.

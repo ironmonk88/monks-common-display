@@ -26,6 +26,10 @@
   "MonksCommonDisplay.per-scene.hint": "Store the settings per scene so each scene can have different display",
   "MonksCommonDisplay.hide-ui.name": "Hide UI",
   "MonksCommonDisplay.hide-ui.hint": "Hide the UI for the common display",
+  "MonksCommonDisplay.focus-padding.name": "Focus Padding",
+  "MonksCommonDisplay.focus-padding.hint": "Padding around the focused token",
+  "MonksCommonDisplay.show-vertical.name": "Show Vertical",
+  "MonksCommonDisplay.show-vertical.hint": "Show common display interface vertically",
 
   "MonksCommonDisplay.change-settings": "Change Settings",
   "MonksCommonDisplay.mirror-screen": "Mirror Screen",
