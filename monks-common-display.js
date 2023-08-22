@@ -21,7 +21,7 @@ export let patchFunc = (prop, func, type = "WRAPPER") => {
     let nonLibWrapper = () => {
         const oldFunc = eval(prop);
         eval(`${prop} = function (event) {
-            return func.call(this, oldFunc.bind(this), ...arguments);
+            return func.call(this, ${type != "OVERRIDE" ? "oldFunc.bind(this)," : ""} ...arguments);
         }`);
     }
     if (game.modules.get("lib-wrapper")?.active) {
