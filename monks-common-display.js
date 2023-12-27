@@ -861,8 +861,8 @@ Hooks.on("updateCombat", async function (combat, delta) {
 });
 
 Hooks.on("targetToken", async function (user, token, targeted) {
-    if (game.combats.viewed.started &&
-        game.combats.viewed.active &&
+    if (game.combats.viewed?.started &&
+        game.combats.viewed?.active &&
         MonksCommonDisplay.screenValue == "combat")
     {
         window.setTimeout(() => {

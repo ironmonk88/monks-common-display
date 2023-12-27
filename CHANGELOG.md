@@ -1,3 +1,9 @@
+# Version 11.06
+
+Fixed issue with targeting a token when there's no active combat.
+
+Added smalltime, bossbar, and conversation hud to module exceptions.
+
 # Version 11.03
 
 Updated combat view to alter the view field to include targeted tokens.
