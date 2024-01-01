@@ -1,3 +1,7 @@
+# Version 11.07
+
+Added support for Storyteller
+
 # Version 11.06
 
 Fixed issue with targeting a token when there's no active combat.
