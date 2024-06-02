@@ -15,7 +15,7 @@
     <div class="flexcol common-button-group" data-action="screen">
         <div class="header screen" data-tooltip="Set what the player screen should mirror">Screen <i class="fas fa-cog" style="font-size: 10px;"></i></div>
         <div class="flexrow content{{#if screen.active}} active{{/if}}">
-            <div class="toggle {{#if screen.active}} active{{/if}} screen common-display-button">
+            <div class="toggle {{#if screen.active}} active{{/if}} screen common-display-button" data-tooltip="{{screen.tooltip}}">
                 {{#if screen.img}}
                 <img src="{{screen.img}}"/>
                 {{else}}
@@ -27,7 +27,7 @@
     <div class="flexcol common-button-group" data-action="focus">
         <div class="header focus" data-tooltip="Set what token should be controlled">Vision <i class="fas fa-cog" style="font-size: 10px;"></i></div>
         <div class="flexrow content{{#if focus.active}} active{{/if}}">
-            <div class="toggle {{#if focus.active}} active{{/if}} focus common-display-button">
+            <div class="toggle {{#if focus.active}} active{{/if}} focus common-display-button" data-tooltip="{{focus.tooltip}}">
                 {{#if focus.img}}
                 <img src="{{focus.img}}" />
                 {{else}}

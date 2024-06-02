@@ -8,7 +8,7 @@ export class PlayerInterface extends Application {
     }
 
     static get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             id: "player-display",
             title: "",
             template: "./modules/monks-common-display/templates/player-interface.html",

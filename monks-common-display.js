@@ -47,7 +47,7 @@ function registerLayer() {
     };
     */
     /*
-    const layers = mergeObject(Canvas.layers, {
+    const layers = foundry.utils.mergeObject(Canvas.layers, {
         MonksCommonDisplayLayer: MonksCommonDisplayLayer
     });
     Object.defineProperty(Canvas, 'layers', {
@@ -77,7 +77,7 @@ export class MonksCommonDisplay {
 
         //registerLayer();
 
-        let noteWarn = async function (wrapped, ...args) {
+        patchFunc("Notifications.prototype.warn", async function (wrapped, ...args) {
             let [message, options] = args;
 
             let display = MonksCommonDisplay.playerdata.display || false;
@@ -85,22 +85,13 @@ export class MonksCommonDisplay {
                 return;
 
             return wrapped(...args);
-        }
+        }, "MIXED");
 
-        if (game.modules.get("lib-wrapper")?.active) {
-            libWrapper.register("monks-common-display", "Notifications.prototype.warn", noteWarn, "MIXED");
-        } else {
-            const oldNoteWarn = Notifications.prototype.warn;
-            Notifications.prototype.warn = function (event) {
-                return noteWarn.call(this, oldNoteWarn.bind(this), ...arguments);
-            }
-        }
-
-        let checkShowImage = async function (wrapped, ...args) {
+        patchFunc("Journal.prototype.constructor.showImage", async function (wrapped, ...args) {
             let [src, data] = args;
 
-            let commonid = randomID();
-            setProperty(data, "commonid", commonid);
+            let commonid = foundry.utils.randomID();
+            foundry.utils.setProperty(data, "commonid", commonid);
             await wrapped(src, data);
 
             let closeAfter = setting("close-after") ?? 0;
@@ -109,19 +100,10 @@ export class MonksCommonDisplay {
                     MonksCommonDisplay.emit("closeImage", { args: { id: commonid } });
                 }, closeAfter * 1000);
             }
-        }
+        });
 
-        if (game.modules.get("lib-wrapper")?.active) {
-            libWrapper.register("monks-common-display", "Journal.prototype.constructor.showImage", checkShowImage, "WRAPPER");
-        } else {
-            const oldShowImage = Journal.prototype.constructor.showImage;
-            Journal.prototype.constructor.showImage = function (event) {
-                return checkShowImage.call(this, oldShowImage.bind(this), ...arguments);
-            }
-        }
-
-        let checkShareImage = async function (...args) {
-            let commonid = randomID();
+        patchFunc("ImagePopout.prototype.shareImage", async function (...args) {
+            let commonid = foundry.utils.randomID();
             game.socket.emit("shareImage", {
                 image: this.object,
                 title: this.options.title,
@@ -140,17 +122,9 @@ export class MonksCommonDisplay {
                     MonksCommonDisplay.emit("closeImage", { args: { id: commonid } });
                 }, closeAfter * 1000);
             }
-        }
+        }, "OVERRIDE");
 
-        if (game.modules.get("lib-wrapper")?.active) {
-            libWrapper.register("monks-common-display", "ImagePopout.prototype.shareImage", checkShareImage, "OVERRIDE");
-        } else {
-            ImagePopout.prototype.shareImage = function (event) {
-                return checkShareImage.call(this, ...arguments);
-            }
-        }
-
-        let handleShared = async function (wrapped, ...args) {
+        patchFunc("ImagePopout.prototype.constructor._handleShareImage", async function (wrapped, ...args) {
             let [options] = args;
             let ip = await wrapped(...args);
 
@@ -159,18 +133,9 @@ export class MonksCommonDisplay {
             }
 
             return ip;
-        }
+        });
 
-        if (game.modules.get("lib-wrapper")?.active) {
-            libWrapper.register("monks-common-display", "ImagePopout.prototype.constructor._handleShareImage", handleShared, "WRAPPER");
-        } else {
-            const oldHandleImage = ImagePopout.prototype.constructor._handleShareImage;
-            ImagePopout.prototype.constructor._handleShareImage = function (event) {
-                return handleShared.call(this, oldHandleImage.bind(this), ...arguments);
-            }
-        }
-
-        let clickEntryName = async function (wrapped, ...args) {
+        patchFunc("ActorDirectory.prototype._onClickEntryName", async function (wrapped, ...args) {
             let event = args[0];
             if (!!MonksCommonDisplay.selectToken) {
                 event.preventDefault();
@@ -178,7 +143,7 @@ export class MonksCommonDisplay {
 
                 if (setting("per-scene")) {
                     await canvas.scene.setFlag("monks-common-display", MonksCommonDisplay.selectToken, documentId);
-                    setProperty(canvas.scene, `flags.monks-common-display.${MonksCommonDisplay.selectToken}`, documentId);
+                    foundry.utils.setProperty(canvas.scene, `flags.monks-common-display.${MonksCommonDisplay.selectToken}`, documentId);
                 } else {
                     await game.settings.set("monks-common-display", MonksCommonDisplay.selectToken, documentId);
                 }
@@ -189,12 +154,10 @@ export class MonksCommonDisplay {
                     MonksCommonDisplay.toolbar.render(true);
             } else
                 wrapped(...args);
-        }
-
-        patchFunc("ActorDirectory.prototype._onClickEntryName", clickEntryName, "MIXED");
+        }, "MIXED");
 
         /*
-        let showEntry = async function (...args) {
+        patchFunc("Journal.prototype.constructor._showEntry", async function (...args) {
             let entry = await fromUuid(uuid);
             const options = { tempOwnership: force, mode: JournalSheet.VIEW_MODES.MULTIPLE, pageIndex: 0 };
             if (entry instanceof JournalEntryPage) {
@@ -214,18 +177,10 @@ export class MonksCommonDisplay {
             if (options.commonid) {
                 MonksCommonDisplay.windows[options.commonid] = ip;
             }
-        }
-    
-        if (game.modules.get("lib-wrapper")?.active) {
-            libWrapper.register("monks-common-display", "Journal.prototype.constructor._showEntry", showEntry, "OVERRIDE");
-        } else {
-            Journal.prototype.constructor._showEntry = function (event) {
-                return showEntry.call(this, ...arguments);
-            }
-        }
+        }, "OVERRIDE");
         */
 
-        let addConvertMenu = function (wrapped, ...args) {
+        patchFunc("PlayerList.prototype._getUserContextOptions", function (wrapped, ...args) {
             let menu = wrapped(...args);
 
             menu.push({
@@ -249,21 +204,12 @@ export class MonksCommonDisplay {
             });
 
             return menu;
-        }
+        });
 
-        if (game.modules.get("lib-wrapper")?.active) {
-            libWrapper.register("monks-common-display", "PlayerList.prototype._getUserContextOptions", addConvertMenu, "WRAPPER");
-        } else {
-            const oldContext = PlayerList.prototype._getUserContextOptions;
-            PlayerList.prototype._getUserContextOptions = function (event) {
-                return addConvertMenu.call(this, oldContext.bind(this), ...arguments);
-            }
-        }
-
-        let sceneView = async function (wrapped, ...args) {
+        patchFunc("Scene.prototype.view", async function (wrapped, ...args) {
             let result = await wrapped.call(this, ...args);
             if (MonksCommonDisplay.playerdata.display || false) {
-                
+
                 if (setting("screen-toggle")) {
                     if (MonksCommonDisplay.screenValue == "gm")
                         MonksCommonDisplay.emit("requestScreenPosition");
@@ -282,16 +228,7 @@ export class MonksCommonDisplay {
                 MonksCommonDisplay.sendScreenMessage("canvasPan", game.canvas.scene._viewPosition);
 
             return result;
-        }
-
-        if (game.modules.get("lib-wrapper")?.active) {
-            libWrapper.register("monks-common-display", "Scene.prototype.view", sceneView, "WRAPPER");
-        } else {
-            const oldSceneView = Scene.prototype.view;
-            Scene.prototype.view = function (event) {
-                return sceneView.call(this, oldSceneView.bind(this), ...arguments);
-            }
-        }
+        });
     }
 
     static ready() {
@@ -430,7 +367,7 @@ export class MonksCommonDisplay {
     }
 
     static onMessage(data) {
-        log('onMessage', data);
+        //log('onMessage', data);
         MonksCommonDisplay[data.action].call(MonksCommonDisplay, data.args)
     }
 
@@ -499,7 +436,7 @@ export class MonksCommonDisplay {
     static screenChanged() {
         if (MonksCommonDisplay.screenValue == "gm") {
             if (canvas.scene.active) {
-                let data = mergeObject({ animate: true, speed: 1000 }, game.canvas.scene._viewPosition);
+                let data = foundry.utils.mergeObject({ animate: true, speed: 1000 }, game.canvas.scene._viewPosition);
                 MonksCommonDisplay.sendScreenMessage("canvasPan", data);
             }
         } else if (MonksCommonDisplay.screenValue == "scene") {
@@ -516,10 +453,15 @@ export class MonksCommonDisplay {
             if (tokens && tokens.length) {
                 let x1, y1, x2, y2;
                 for (let token of tokens) {
-                    x1 = !x1 ? token.x : Math.min(x1, token.x);
-                    y1 = !y1 ? token.y : Math.min(y1, token.y);
-                    x2 = !x2 ? token.x + (token.width * canvas.dimensions.size) : Math.max(x2, token.x + (token.width * canvas.dimensions.size));
-                    y2 = !y2 ? token.y + (token.height * canvas.dimensions.size) : Math.max(y2, token.y + (token.height * canvas.dimensions.size));
+                    let x = token._mcd_x ?? token.x;
+                    let y = token._mcd_y ?? token.y;
+                    delete token._mcd_x;
+                    delete token._mcd_y;
+                    log('Token', token.name, x, y);
+                    x1 = !x1 ? x : Math.min(x1, x);
+                    y1 = !y1 ? y : Math.min(y1, y);
+                    x2 = !x2 ? x + (token.width * canvas.dimensions.size) : Math.max(x2, x + (token.width * canvas.dimensions.size));
+                    y2 = !y2 ? y + (token.height * canvas.dimensions.size) : Math.max(y2, y + (token.height * canvas.dimensions.size));
                 }
 
                 if (setting("show-chat-log"))
@@ -529,11 +471,16 @@ export class MonksCommonDisplay {
                 // I also need to make sure that the entire rectangle is within the screen
                 let screenWidth = $('body').width() - (setting("show-chat-log") ? $("#sidebar").width() : 0);
                 let ratio = screenWidth / $('body').height();
-                let width = Math.max((x2 - x1) + (6 * canvas.dimensions.size), (setting("focus-padding") * ratio * canvas.dimensions.size));
-                let height = Math.max((y2 - y1) + (6 * canvas.dimensions.size), (setting("focus-padding") * canvas.dimensions.size));
+                let width = Math.max((x2 - x1) + canvas.dimensions.size, (setting("focus-padding") * ratio * canvas.dimensions.size));
+                let height = Math.max((y2 - y1) + canvas.dimensions.size, (setting("focus-padding") * canvas.dimensions.size));
                 let scaleWidth = screenWidth / width;
                 let scaleHeight = $('body').height() / height;
-                let panData = { x: x1 + ((x2 - x1) / 2), y: y1 + ((y2 - y1) / 2), animate: true, speed: 200, scale: Math.min(scaleWidth, scaleHeight) };
+                let panData = { x: x1 + ((x2 - x1) / 2), y: y1 + ((y2 - y1) / 2), animate: true, scale: Math.min(scaleWidth, scaleHeight) };
+                if (panData.x != canvas.scene._viewPosition.x || panData.y != canvas.scene._viewPosition.y) {
+                    panData.speed = 250;
+                } else {
+                    panData.duration = 1000;
+                }
 
                 canvas.animatePan(panData);
             }
@@ -588,15 +535,15 @@ export class MonksCommonDisplay {
     }
 
     static get screenValue() {
-        return setting("per-scene") ? getProperty(canvas.scene, "flags.monks-common-display.screen") : setting("screen");
+        return setting("per-scene") ? foundry.utils.getProperty(canvas.scene, "flags.monks-common-display.screen") : setting("screen");
     }
 
     static get focusValue() {
-        return setting("per-scene") ? getProperty(canvas.scene, "flags.monks-common-display.focus") : setting("focus");
+        return setting("per-scene") ? foundry.utils.getProperty(canvas.scene, "flags.monks-common-display.focus") : setting("focus");
     }
 
     static isDefeated(token) {
-        return (token && (token.combatant && token.combatant.defeated) || token.actor?.statuses.has(CONFIG.specialStatusEffects.DEFEATED) || token.overlayEffect == CONFIG.controlIcons.defeated);
+        return (token && (token.combatant && token.combatant.defeated) || token.actor?.statuses.has(CONFIG.specialStatusEffects.DEFEATED));
     }
 
     static getTokens(value) {
@@ -774,22 +721,6 @@ Hooks.on('renderSceneControls', (control, html, data) => {
 });
 
 Hooks.on("controlToken", async (token, control) => {
-    /*
-    if (control && !!MonksCommonDisplay.selectToken) {
-        if (setting("per-scene")) {
-            await canvas.scene.setFlag("monks-common-display", MonksCommonDisplay.selectToken, token.id);
-            setProperty(canvas.scene, `flags.monks-common-display.${MonksCommonDisplay.selectToken}`, token.id);
-        } else {
-            await game.settings.set("monks-common-display", MonksCommonDisplay.selectToken, token.id);
-        }
-        if (MonksCommonDisplay.selectToken == "screen") MonksCommonDisplay.screenChanged(); else MonksCommonDisplay.focusChanged();
-
-        MonksCommonDisplay.selectToken = null;
-
-        if (MonksCommonDisplay.toolbar && setting("show-toolbar") && game.user.isGM)
-            MonksCommonDisplay.toolbar.render(true);
-    }*/
-
     let focus = MonksCommonDisplay.focusValue;
 
     if (focus == "gm" && game.user.isGM && setting("focus-toggle")) {
@@ -825,11 +756,14 @@ Hooks.on("updateToken", async function (document, data, options, userid) {
         MonksCommonDisplay.toolbar.render(true);
 
     let display = MonksCommonDisplay.playerdata.display || false;
+    log("updateToken", display, data, setting("screen-toggle"), document.hidden);
     if (display &&
         (data.x != undefined || data.y != undefined) &&
         setting("screen-toggle") &&
         !document.hidden) {
 
+        document._mcd_x = data.x ?? document.x;
+        document._mcd_y = data.y ?? document.y;
         MonksCommonDisplay.changeScreen();
     }
 });

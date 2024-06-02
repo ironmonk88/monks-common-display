@@ -4,7 +4,7 @@ export class MonksCommonDisplayLayer extends InteractionLayer {
     }
 
     static get layerOptions() {
-        return mergeObject(super.layerOptions, {
+        return foundry.utils.mergeObject(super.layerOptions, {
             objectClass: Note,
             sheetClass: NoteConfig,
             sheetClasses: {

@@ -6,7 +6,7 @@ export class ControllerApp extends FormApplication {
     }
 
     static get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             id: "monkscommondisplay",
             title: "Monks Common Display",
             template: "./modules/monks-common-display/templates/controller.html",
@@ -22,7 +22,7 @@ export class ControllerApp extends FormApplication {
             (setting('allow-gm-players') ? u.id != game.user.id && u.role < CONST.USER_ROLES.GAMEMASTER : !u.isGM))
             .map(u => {
                 let data = playerdata[u.id] || {};
-                return mergeObject({
+                return foundry.utils.mergeObject({
                     id: u.id,
                     name: u.name,
                     img: u.avatar,

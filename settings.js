@@ -60,12 +60,15 @@ export const registerSettings = function () {
 		scope: "world",
 		config: true,
 		range: {
-			min: 5,
+			min: 1,
 			max: 30,
 			step: 1,
 		},
 		default: 10,
-		type: Number
+		type: Number,
+		onChange: () => {
+			MonksCommonDisplay.screenChanged();
+        }
 	});
 
 	game.settings.register(modulename, "show-chat-log", {
