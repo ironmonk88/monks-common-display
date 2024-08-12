@@ -1,3 +1,17 @@
+# Version 12.01
+
+v12 Compatibility
+
+Added tooltip to describe what the icons mean
+
+Fixed issue where clicking on the header wasn't opening a context menu with options
+
+Fixed issue with figuring out the screen size when a token moves
+
+Fixed issue when the scale changes but the tokens don't move, not animating to the scale changes
+
+Updated the screen padding option to handle less padding
+
 # Version 11.07
 
 Added support for Storyteller
